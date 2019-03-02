@@ -14,21 +14,24 @@ export const mutations = {
     state.search_ap_failed = !!error 
     state.found_ap_box = box
   },
+  add_box(state, box) {
+    state.boxes.push(box)
+  }
 }
 
 export const actions = {
   search_ap_box(context) {
+    let box = {
+      loaded: false,
+      device_name: 'SuperGreenDummy',
+    }
     context.commit('start_search_ap_box')
     setTimeout(() => {
-      context.commit('end_search_ap_box', {
-        loaded: false,
-        device_name: 'SuperGreenDummy',
-      }, null)
+      context.commit('end_search_ap_box', box, null)
       setTimeout(() => {
-        context.commit('end_search_ap_box', {
-          loaded: true,
-          device_name: 'SuperGreenDummy',
-        }, null)
+        box = Object.assign({}, box, {loaded: true})
+        context.commit('end_search_ap_box', box, null)
+        context.commit('add_box', box)
       }, 3000)
     }, 3000)
   }

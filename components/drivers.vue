@@ -1,12 +1,9 @@
 <template>
-  <section id='container'>
-    <div id='list'>
-      <ul>
-        <li>
-          Box 1
-        </li>
-      </ul>
+  <section :id='$style.container'>
+    <div :id='$style.list'>
+      
     </div>
+    <nuxt-link to="/welcome">New</nuxt-link>
   </section>
 </template>
 
@@ -16,8 +13,11 @@ export default {
 </script>
 
 <style module lang=stylus>
-#container {
-}
+#container
+  display: flex
+  height: 100%
+  justify-content: space-between
+  flex-direction: column
 
 #list ul
   padding: 3pt 10pt

@@ -1,6 +1,5 @@
 <template>
   <section id='container'>
-    <nuxt-link to="/welcome">New</nuxt-link>
   </section>
 </template>
 
