@@ -19,5 +19,7 @@ export default {
 #container > a
   color: #5DBD37
   text-decoration: none
+  font-size: 20pt
+  font-weight: bold
 
 </style>

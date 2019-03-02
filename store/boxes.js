@@ -21,8 +21,15 @@ export const actions = {
     context.commit('start_search_ap_box')
     setTimeout(() => {
       context.commit('end_search_ap_box', {
+        loaded: false,
         device_name: 'SuperGreenDummy',
       }, null)
+      setTimeout(() => {
+        context.commit('end_search_ap_box', {
+          loaded: true,
+          device_name: 'SuperGreenDummy',
+        }, null)
+      }, 3000)
     }, 3000)
   }
 }

@@ -1,8 +1,8 @@
 <template>
   <section :id='$style.container'>
     <section :id='$style.body'>
-      <p>Welcome to</p>
-      <img src="~/assets/img/SuperGreenWallpaper.svg">
+      <p><b>Welcome to</b></p>
+      <Logo color='black' size='3em' />
     </section>
     <section :id='$style.nav'>
       <NextButton v-on:click.native='onNext' to='/new-step-plug' />
@@ -11,10 +11,11 @@
 </template>
 
 <script>
+import Logo from '../components/logo'
 import NextButton from '../components/nextbutton'
 
 export default {
-  components: { NextButton, },
+  components: { Logo, NextButton, },
   layout: 'fullscreen',
   methods: {
     onNext(e) {

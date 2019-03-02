@@ -1,11 +1,18 @@
 <template>
   <section :id='$style.container'>
-    <section :id='$style.body'>
+    <section v-if='!loaded' :id='$style.body'>
       <h1>
         Found !
       </h1>
+      <p>Loading a few additional stuffs..</p>
     </section>
-    <section :id='$style.nav'>
+    <section v-else :id='$style.body'>
+      <h1>
+        Ok all good, move on:)
+      </h1>
+    </section>
+
+    <section v-if='loaded' :id='$style.nav'>
       <NextButton v-on:click.native='onNext' to='/' />
     </section>
   </section>
@@ -15,12 +22,13 @@
 import NextButton from '../components/nextbutton'
 
 export default {
+  computed: {
+    loaded () {
+      return this.$store.state.boxes.found_ap_box.loaded
+    }
+  },
   components: { NextButton, },
   layout: 'fullscreen',
-  methods: {
-    onNext(e) {
-    }
-  }
 }
 </script>
 
