@@ -1,0 +1,29 @@
+{
+  "name": "supergreendesktop",
+  "version": "1.0.0",
+  "description": "SuperGreenDesktop",
+  "author": "vitaminwater <stantin04@gmail.com>",
+  "private": true,
+  "main": "main.js",
+  "build": {
+    "appId": "com.supergreenlab.desktopapp",
+    "directories": {
+      "buildResources": "static"
+    }
+  },
+  "scripts": {
+    "dev": "cross-env NODE_ENV=DEV electron .",
+    "build": "nuxt build && electron-builder"
+  },
+  "dependencies": {
+    "nuxt": "^1.4.0",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2"
+  },
+  "devDependencies": {
+    "cross-env": "^5.1.4",
+    "electron": "2.0.0-beta.7",
+    "electron-builder": "^20.8.1",
+    "electron-devtools-installer": "^2.2.3"
+  }
+}
