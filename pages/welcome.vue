@@ -6,6 +6,7 @@
     </section>
     <section :id='$style.nav'>
       <NextButton v-on:click.native='onNext' to='/new-step-plug' />
+      <small>* clicking this "Next &gt;" button confirms that you are major in your state and are not violating any laws.</small>
     </section>
   </section>
 </template>
@@ -45,6 +46,7 @@ export default {
 
 #nav
   display: flex
-  justify-content: flex-end
+  align-items: flex-end
+  flex-direction: column
 
 </style>

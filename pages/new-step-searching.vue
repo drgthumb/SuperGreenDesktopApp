@@ -14,15 +14,15 @@ export default {
   components: { NextButton, },
   layout: 'fullscreen',
   mounted() {
-    this.$store.dispatch('boxes/search_ap_box')
+    this.$store.dispatch('controllers/search_ap_controller')
   },
   created() {
-    this.$store.watch(state => state.boxes.searching_ap, () => {
-      const state = this.$store.state.boxes
+    this.$store.watch(state => state.controllers.searching_ap, () => {
+      const state = this.$store.state.controllers
       if (state.searching_ap == true) {
         return
       }
-      if (state.found_ap_box != null) {
+      if (state.found_ap_controller != null) {
         this.$router.push('/new-step-found')
       } else if (state.search_ap_failed) {
         this.$router.push('/new-step-notfound')

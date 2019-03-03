@@ -1,8 +1,8 @@
 <template>
 	<section :id='$style.container'>
     <section :id='$style.menu'>
-      <Logo vertical=true size='1.4em' />
-      <Drivers />
+      <Logo margin='5pt' vertical=true size='1.2em' />
+      <Controllers />
     </section>
     <section :id='$style.body'>
       <nuxt/>
@@ -12,10 +12,10 @@
 
 <script>
 import Logo from '../components/logo'
-import Drivers from '../components/drivers'
+import Controllers from '../components/controllers'
 
 export default {
-  components: { Logo, Drivers, },
+  components: { Logo, Controllers, },
 }
 </script>
 
@@ -29,7 +29,6 @@ export default {
 
 #menu
   display: flex
-  padding: 10pt
   background-color: #454545
   flex-direction: column
 

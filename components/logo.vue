@@ -1,5 +1,5 @@
 <template>
-  <span :id='$style.supergreenlab' :style='{"font-size": size, color}'>
+  <span :id='$style.supergreenlab' :style='{"font-size": size, color, margin}'>
     <span :class='vertical == true ? $style.supersmallword : ""'>S<span :class='$style.supersmall'>upe</span>r</span><br v-if='vertical != false' />
     <span :class='$style.supergreen'>G<span :class='$style.supersmall'>ree</span>n</span><br v-if='vertical != false' />
     <span>L<span :class='$style.supersmall'>a</span>b</span>
@@ -18,15 +18,19 @@ export default {
     color: {
       default: 'white',
     },
+    margin: {
+      default: '0pt',
+    },
   }
 }
 </script>
 
 <style module lang=stylus>
+
 #supergreenlab
   font-family: 'PlumeAd'
   text-transform: uppercase
-  letter-spacing: 1pt;
+  letter-spacing: 1pt
   text-align: center
 
 .supergreen
@@ -37,4 +41,5 @@ export default {
 
 .supersmallword
   font-size: 0.85em
+
 </style>

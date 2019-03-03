@@ -2,23 +2,22 @@
   <section :id='$style.container'>
     <section :id='$style.body'>
       <h1>
-        Found !
+        Ok all good, move on:)
       </h1>
-      <p>Loading a few additional stuffs..</p>
+    </section>
+
+    <section :id='$style.nav'>
+      <NextButton to='/' />
     </section>
   </section>
 </template>
 
 <script>
+import NextButton from '../components/nextbutton'
+
 export default {
+  components: { NextButton, },
   layout: 'fullscreen',
-  created() {
-    this.$store.watch(state => state.controllers.found_ap_controller.loaded, () => {
-      if (this.$store.state.controllers.found_ap_controller.loaded) {
-        this.$router.push('/new-step-done')
-      }
-    })
-  },
 }
 </script>
 
