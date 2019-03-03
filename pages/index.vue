@@ -1,6 +1,6 @@
 <template>
   <section v-if='controller' :id='$style.container'>
-    {{ controller.device_name }}
+    {{ controller.device_name.value }}
     <Box v-for='(box, i) in controller.boxes' :box='box' :key='i' />
   </section>
 </template>

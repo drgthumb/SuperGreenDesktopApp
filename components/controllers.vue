@@ -3,7 +3,7 @@
     <div :id='$style.list'>
       <div v-for='(controller, i) in controllers' :class='controller.mqtt_client_id === selected ? $style.selected : ""' v-on:click='setSelected(controller.mqtt_client_id)'>
         <small>Controller {{ i + 1 }}</small><br />
-        <b>{{ controller.device_name }}</b><br />
+        <b>{{ controller.device_name.value }}</b><br />
         <small :class='$style.green'>Online</small>
       </div>
     </div>
