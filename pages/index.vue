@@ -1,16 +1,20 @@
 <template>
-  <section v-if='controller' id='container'>
+  <section v-if='controller' :id='$style.container'>
     {{ controller.device_name }}
+    <Box v-for='(box, i) in controller.boxes' :box='box' :key='i' />
   </section>
 </template>
 
 <script>
+import Box from '../components/box'
+
 export default {
+  components: { Box },
   computed: {
     controller() {
       return this.$store.getters['controllers/getSelected']
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -18,12 +22,10 @@ export default {
 
 #container
   display: flex
+  flex: 1
+  flex-direction: column
   min-height: 100vh
   background-color: #efefef
-
-  justify-content: center
-  align-items: center
-
-  text-align: center
+  padding: 20pt
 
 </style>

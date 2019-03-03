@@ -21,5 +21,9 @@ export default {
   text-decoration: none
   font-size: 15pt
   font-weight: bold
+  transition: opacity 0.2s
+
+#container > a:hover
+  opacity: 0.3
 
 </style>

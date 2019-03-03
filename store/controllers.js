@@ -1,3 +1,6 @@
+import axios from 'axios'
+import dummy_config from '../dummy_config.json'
+
 export const state = () => ({
   searching_ap: false,
   search_ap_failed: false,
@@ -40,6 +43,8 @@ export const actions = {
     let controller = {
       loaded: false,
       device_name: 'Dummy',
+      boxes: [],
+      leds: [],
     }
     context.commit('start_search_ap_controller')
     setTimeout(() => {
