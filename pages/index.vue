@@ -26,5 +26,6 @@ export default {
   min-height: 100vh
   background-color: #efefef
   padding: 20pt
+  overflow-y: auto
 
 </style>
