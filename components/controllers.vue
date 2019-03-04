@@ -1,7 +1,7 @@
 <template>
   <section :id='$style.container'>
     <div :id='$style.list'>
-      <div v-for='(controller, i) in controllers' :class='controller.mqtt_client_id === selected ? $style.selected : ""' v-on:click='setSelected(controller.mqtt_client_id)'>
+      <div v-for='(controller, i) in controllers' :class='controller.broker_clientid.value === selected ? $style.selected : ""' v-on:click='setSelected(controller)'>
         <small>Controller {{ i + 1 }}</small><br />
         <b>{{ controller.device_name.value }}</b><br />
         <small :class='$style.green'>Online</small>
@@ -24,8 +24,13 @@ export default {
     },
   },
   methods: {
-    setSelected(mqtt_client_id) {
-      this.$store.commit('controllers/set_selected', mqtt_client_id)
+    setSelected(controller) {
+      if (controller.state.value == 0) {
+        this.$router.push('/first_setup_controller')
+      } else {
+        this.$router.push('/')
+      }
+      this.$store.commit('controllers/set_selected', controller.broker_clientid.value)
     }
   },
 }

@@ -35,7 +35,7 @@ for (let i in version_config.keys) {
     }
     controller_defaults.i2c[key.i2c.index][key.i2c.param] = new_loadable_key(key)
   } else {
-    controller_defaults[key.name] = new_loadable_key(key.name)
+    controller_defaults[key.name] = new_loadable_key(key)
   }
 }
 
@@ -49,7 +49,7 @@ export const state = () => ({
 
 const getById = function(state, id) {
   const controllers = state.controllers
-  return controllers.find((c) => c.mqtt_client_id == id)
+  return controllers.find((c) => c.broker_clientid.value == id)
 }
 
 export const getters = {
@@ -74,21 +74,52 @@ export const mutations = {
   set_selected(state, id) {
     state.selected = id
   },
+  set_loaded(state, id) {
+    let controller = getById(state, id)
+    controller.loaded = true
+  },
+  loaded_controller_param(state, id, key, value) {
+    let controller = getById(state, id)
+    controller[key].value = value
+    controller[key].loaded = true
+  },
+  loaded_box_param(state, id, i, key, value) {
+    let controller = getById(state, id)
+    controller.boxes[i][key].value = value
+    controller.boxes[i][key].loaded = true
+  },
+  loaded_led_param(state, id, i, key, value) {
+    let controller = getById(state, id)
+    controller.leds[i][key].value = value
+    controller.leds[i][key].loaded = true
+  },
+  loaded_i2c_param(state, id, i, key, value) {
+    let controller = getById(state, id)
+    controller.i2c[i][key].value = value
+    controller.i2c[i][key].loaded = true
+  },
 }
 
 export const actions = {
   search_ap_controller(context) {
-    let controller = Object.assign({}, controller_defaults)
     context.commit('start_search_ap_controller')
     setTimeout(() => {
+
+      let controller = Object.assign({}, controller_defaults)
+      let broker_clientid = ''+parseInt(Math.random() * 10000)
       controller.device_name.value = 'Office'
       controller.device_name.loaded = true
+      controller.broker_clientid.value = broker_clientid
+      controller.broker_clientid.loaded = true
       context.commit('end_search_ap_controller', controller, null)
+
       setTimeout(() => {
-        controller = Object.assign({}, controller, {loaded: true})
-        context.commit('end_search_ap_controller', controller, null)
+
         context.commit('add_controller', controller)
-        context.commit('set_selected', controller.mqtt_client_id)
+        context.commit('set_selected', broker_clientid)
+        context.commit('set_loaded', broker_clientid, null)
+        context.commit('end_search_ap_controller', controller, null)
+
       }, 3000)
     }, 3000)
   }

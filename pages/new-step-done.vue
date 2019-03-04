@@ -7,7 +7,7 @@
     </section>
 
     <section :id='$style.nav'>
-      <NextButton to='/' />
+      <NextButton :to='controller.state.value == 0 ? "/first_setup_controller" : "/"' />
     </section>
   </section>
 </template>
@@ -18,6 +18,11 @@ import NextButton from '../components/nextbutton'
 export default {
   components: { NextButton, },
   layout: 'fullscreen',
+  computed: {
+    controller() {
+      return this.$store.getters['controllers/getSelected']
+    }
+  },
 }
 </script>
 
