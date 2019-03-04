@@ -1,7 +1,9 @@
 <template>
   <section v-if='controller' :id='$style.container'>
-    {{ controller.device_name.value }}
-    <Box v-for='(box, i) in controller.boxes' :i='i' :controller='controller' :box='box' :key='i' />
+    <h1>New box detected.</h1>
+    <h3>Pick your kit:</h3>
+    <div :id='$style.presets'>
+    </div>
   </section>
 </template>
 
@@ -27,5 +29,11 @@ export default {
   min-height: 100vh
   background-color: #efefef
   padding: 20pt
+  align-items: center
+  justify-content: center
+
+#presets
+  display: flex
+  flex: 1
 
 </style>
