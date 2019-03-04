@@ -3,14 +3,19 @@
     Control
     <div :id='$style.control'>
       <div :id='$style.boxonoff'>
-        on
-        <img :src='box.enabled ? "~/assets/img/on.svg" : "~/assets/img/off.svg"' />
-        off
+        On
+        <div :class='`${$style.onoff} ${(box.enabled ? $style.on : $style.off)}`' v-on:click='toggleOnOff()'></div>
+        Off
       </div>
       <div :id='$style.leds'>
         <div v-for='(led, j) in controller.leds' v-if='led.box.value == i' :key='j' :class='$style.led'>
           <LedControl :i='i' :box='box' :controller='controller' :j='j' :led='led' />
         </div>
+      </div>
+      <div :id='$style.blower'>
+        <img src='~/assets/img/vent-small.svg' />
+        <div :id='$style.sliderw'><Slider :onValueChanged='onValueChanged' /></div>
+        <img src='~/assets/img/vent-big.svg' />
       </div>
     </div>
   </section>
@@ -18,10 +23,19 @@
 
 <script>
 import LedControl from '../components/ledcontrol'
+import Slider from '../components/slider'
 
 export default {
-  components: { LedControl, },
-  props: [ 'i', 'box', 'controller', ]
+  components: { LedControl, Slider, },
+  props: [ 'i', 'box', 'controller', ],
+  methods: {
+    toggleOnOff() {
+      console.log('toggleOnOff')
+    },
+    onValueChanged(value) {
+      console.log(value)
+    }
+  },
 }
 </script>
 
@@ -53,5 +67,33 @@ export default {
   display: flex
   align-items: center
   justify-content: center
+
+.onoff
+  display: inline-block
+  width: 40pt
+  height: 20pt
+  margin: 10pt 20pt
+  background-repeat: no-repeat
+  background-size: contain
+  background-position: center
+  cursor: pointer
+
+.on
+  background-image: url('~/assets/img/on.svg')
+
+.off
+  background-image: url('~/assets/img/off.svg')
+
+#blower
+  display: flex
+  padding: 5pt 30pt
+  align-items: center
+  justify-content: center
+
+#sliderw
+  flex: 1
+  display: inline-block
+  margin: 2pt 10pt
+  height: 20pt
 
 </style>

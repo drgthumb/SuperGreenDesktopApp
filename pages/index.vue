@@ -1,6 +1,8 @@
 <template>
   <section v-if='controller' :id='$style.container'>
-    <Box v-for='(box, i) in controller.boxes' :i='i' :controller='controller' :box='box' :key='i' />
+    <div v-for='(box, i) in controller.boxes'>
+      <Box :i='i' :controller='controller' :box='box' :key='i' />
+    </div>
   </section>
 </template>
 
@@ -23,9 +25,7 @@ export default {
   display: flex
   flex: 1
   flex-direction: column
-  min-height: 100vh
   background-color: #efefef
-  padding: 20pt
   overflow-y: auto
 
 </style>

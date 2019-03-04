@@ -2,7 +2,7 @@
   <section :id='$style.container'>
     <b>{{ j + 1 }}</b>
     <div :id='$style.box'>
-      <img :src='led.duty.value > 5 ? "~/assets/img/lighton.svg" : "~/assets/img/lightoff.svg"' />
+      <div :class='`${$style.onoff} ${led.duty.value > 5 ? $style.on : $style.off}`'></div>
       <b>{{ led.duty.value }}%</b>
     </div>
   </section>
@@ -34,10 +34,23 @@ export default {
   color: #8b8b8b
   align-items: center
   justify-content: center
+  width: 45pt
+  height: 45pt
 
-#box > img
+.onoff
   width: 25pt
   height: 25pt
   align-self: flex-end 
+  margin: 2pt
+  background-repeat: no-repeat
+  background-size: contain
+  background-position: center
+  cursor: pointer
+
+.on
+  background-image: url('~/assets/img/lighton.svg')
+
+.off
+  background-image: url('~/assets/img/lightoff.svg')
 
 </style>
