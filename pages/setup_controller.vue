@@ -1,15 +1,20 @@
 <template>
   <section v-if='controller' :id='$style.container'>
-    {{ controller.device_name.value }}
-    <Box v-for='(box, i) in controller.boxes' :i='i' :controller='controller' :box='box' :key='i' />
+    <div :id='$style.setup'>
+      Setup
+    </div>
+    <section :id='$style.nav'>
+      <NextButton to='/' label='Save' />
+    </section>
   </section>
 </template>
 
 <script>
 import Box from '../components/box'
+import NextButton from '../components/nextbutton'
 
 export default {
-  components: { Box },
+  components: { Box, NextButton,  },
   computed: {
     controller() {
       return this.$store.getters['controllers/getSelected']
@@ -26,6 +31,14 @@ export default {
   flex-direction: column
   min-height: 100vh
   background-color: #efefef
+
+#setup
+  flex: 1
   padding: 20pt
+
+#nav
+  display: flex
+  justify-content: flex-end
+  width: 100%
 
 </style>

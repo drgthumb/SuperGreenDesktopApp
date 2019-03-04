@@ -1,12 +1,18 @@
 <template>
   <section :id='$style.container'>
-    <nuxt-link :to='to'>Next &gt;</nuxt-link>
+    <nuxt-link :to='to'>{{ label }} &gt;</nuxt-link>
   </section>
 </template>
 
 <script>
 export default {
-  props: ['to'],
+  props: {
+    'to': String, 
+    'label': {
+      type: String,
+      default: 'Next',
+    },
+  },
 }
 </script>
 

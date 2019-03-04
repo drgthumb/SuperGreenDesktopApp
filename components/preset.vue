@@ -28,9 +28,12 @@ export default {
   max-width: 250pt
   width: 90%
   height: 80%
+  transition: border .2s, opacity .2s
+  opacity: 0.5
 
 .selected
   border: 3pt solid #3bb30b !important
+  opacity: 1 !important
 
 #iconw
   flex: 1

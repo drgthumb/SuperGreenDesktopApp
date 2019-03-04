@@ -7,17 +7,22 @@
         <Preset :id='preset.id' :title='preset.title' :icon='preset.icon' :description='preset.description' :selected='i == selected' />
       </div>
     </div>
+
+    <section :id='$style.nav'>
+      <NextButton to='/setup_controller' />
+    </section>
   </section>
 </template>
 
 <script>
 import Preset from '../components/preset'
+import NextButton from '../components/nextbutton'
 
 export default {
   data: () => ({
     selected: 0,
   }),
-  components: { Preset },
+  components: { Preset, NextButton, },
   computed: {
     controller() {
       return this.$store.getters['controllers/getSelected']
@@ -42,7 +47,6 @@ export default {
   flex-direction: column
   min-height: 100vh
   background-color: #efefef
-  padding: 20pt
   align-items: center
   justify-content: center
   background-color: white
@@ -57,5 +61,10 @@ export default {
   display: flex
   align-items: center
   justify-content: center
+
+#nav
+  display: flex
+  justify-content: flex-end
+  width: 100%
 
 </style>
