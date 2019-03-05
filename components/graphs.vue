@@ -1,17 +1,20 @@
 <template>
-  <section :id='$style.container'>
+  <section v-if='!loading' :id='$style.container'>
     <div :id='$style.value' :style='{color}'>
       {{ title }}
       <h1>{{ value }}</h1>
     </div>
     <div :id='$style.graph'>
-      <svg v-if='!loading' width='100%' height='100%' ref='graph'>
+      <svg width='100%' height='100%' ref='graph'>
         <g>
           <polygon :points="fill_points" :style="{fill: color, opacity: 0.5}"></polygon>
           <path :d="stroke_path" :style="{stroke: color, 'stroke-width': '2pt'}"></path>
         </g>
       </svg>
     </div>
+  </section>
+  <section v-else :id='$style.container'>
+    loading...
   </section>
 </template>
 
@@ -45,6 +48,7 @@ export default {
       console.log(points)
       return points
     },
+
     stroke_path() {
       if (!this.$refs.graph) return ''
       const width = this.$refs.graph.clientWidth,
