@@ -5,7 +5,7 @@
       <section>
         <h3>Connect to the driver’s</b><br />
         wifi network:</h3><br />
-        SSID: 🤖🍁<br />
+        SSID: <div :id='$style.ssid'></div></br >
         Pass: multipass
       </section>
     </section>
@@ -49,5 +49,14 @@ export default {
 #nav
   display: flex
   justify-content: flex-end
+
+#ssid
+  display: inline-block
+  height: 20pt
+  width: 100pt
+  background-image: url('~/assets/img/wifi-ssid.png')
+  background-repeat: no-repeat
+  background-size: contain
+  background-position: left
 
 </style>

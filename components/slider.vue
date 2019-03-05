@@ -17,7 +17,6 @@ export default {
   methods: {
     preventDefault(evt) {
       evt.preventDefault()
-      evt.stopPropagation()
     },
     onMouseDown(evt) {
       this.$data.mouseState = 'down'
@@ -26,13 +25,17 @@ export default {
     },
 
     onMouseUp(evt) {
+      if (this.$data.mouseState == 'down') {
+        this.$props.onValueChanged(this.$data.value)
+      }
       this.$data.mouseState = ''
-      this.$props.onValueChanged(this.$data.value)
     },
 
     onMouseOut(evt) {
+      if (this.$data.mouseState == 'down') {
+        this.$props.onValueChanged(this.$data.value)
+      }
       this.$data.mouseState = ''
-      this.$props.onValueChanged(this.$data.value)
     },
 
     onMouseMove(evt) {

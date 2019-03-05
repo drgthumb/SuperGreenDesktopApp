@@ -14,7 +14,7 @@
       </div>
       <div :id='$style.blower'>
         <img src='~/assets/img/vent-small.svg' />
-        <div :id='$style.sliderw'><Slider :onValueChanged='onValueChanged' /></div>
+        <div :id='$style.sliderw'><Slider :onValueChanged='onBlowerChanged' /></div>
         <img src='~/assets/img/vent-big.svg' />
       </div>
     </div>
@@ -32,7 +32,7 @@ export default {
     toggleOnOff() {
       console.log('toggleOnOff')
     },
-    onValueChanged(value) {
+    onBlowerChanged(value) {
       console.log(value)
     }
   },
