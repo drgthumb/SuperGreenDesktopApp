@@ -1,5 +1,5 @@
 export const state = () => ({
-  sources: {},
+  sources: {}, // will move to flatten state later if needed performance wise
 })
 
 export const mutations = {

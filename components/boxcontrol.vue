@@ -1,6 +1,6 @@
 <template>
   <section :id='$style.container'>
-    Control
+    <b>Control</b>
     <div :id='$style.control'>
       <div :id='$style.boxonoff'>
         On
