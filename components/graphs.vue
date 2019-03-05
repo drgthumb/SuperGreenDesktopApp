@@ -1,20 +1,17 @@
 <template>
-  <section v-if='!loading' :id='$style.container'>
+  <section :id='$style.container'>
     <div :id='$style.value' :style='{color}'>
       {{ title }}
       <h1>{{ value }}</h1>
     </div>
     <div :id='$style.graph'>
       <svg width='100%' height='100%' ref='graph'>
-        <g>
-          <polygon :points="fill_points" :style="{fill: color, opacity: 0.5}"></polygon>
-          <path :d="stroke_path" :style="{stroke: color, 'stroke-width': '2pt'}"></path>
+        <g v-if='!loading'>
+          <polygon :points="fill_points" :style="{fill: color, opacity: 0.2}"></polygon>
+          <path :d="stroke_path" :style="{stroke: color, 'stroke-width': 2}" fill=none></path>
         </g>
       </svg>
     </div>
-  </section>
-  <section v-else :id='$style.container'>
-    loading...
   </section>
 </template>
 
@@ -32,29 +29,46 @@ export default {
       if (!this.$refs.graph) return ''
       const width = this.$refs.graph.clientWidth,
             height = this.$refs.graph.clientHeight,
-            xspan = width / values.length,
-            min = Math.min(values),
-            max = Math.max(values),
-            ymin = min - (max - min) * 0.2
+            values = this.$props.values,
+            xspan = width / (values.length - 1),
+            min = Math.min(...values),
+            max = Math.max(...values),
+            ymin = min - (max - min) * 0.2,
             ymax = max + (max - min) * 0.2
-      console.log(width, height, xspan)
-      let points = '0,0 ',
+      let points = `0,${height} `,
           x = 0
       for (let i in values) {
         const value = (values[i] - ymin) / (ymax - ymin)
         points += `${x},${value * height} `
         x += xspan
       }
-      console.log(points)
+      points += `${width},${height}`
       return points
     },
 
     stroke_path() {
       if (!this.$refs.graph) return ''
       const width = this.$refs.graph.clientWidth,
-            height = this.$refs.graph.clientHeight
-      console.log(width, height)
-      return ''
+            height = this.$refs.graph.clientHeight,
+            values = this.$props.values,
+            xspan = width / (values.length - 1),
+            min = Math.min(...values),
+            max = Math.max(...values),
+            ymin = min - (max - min) * 0.2,
+            ymax = max + (max - min) * 0.2
+      let points = '',
+          x = 0
+      for (let i in values) {
+        if (i == 0) {
+          points += 'M'
+        } else {
+          points += 'L'
+        }
+        const value = (values[i] - ymin) / (ymax - ymin)
+        points += `${x} ${value * height} `
+        x += xspan
+      }
+      return points
     },
   },
 }
