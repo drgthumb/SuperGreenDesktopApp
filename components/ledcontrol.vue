@@ -5,12 +5,23 @@
       <div :class='`${$style.onoff} ${led.duty.value > 5 ? $style.on : $style.off}`'></div>
       <b>{{ led.duty.value }}%</b>
     </div>
+    <div :id='$style.slider'>
+      <Slider :onValueChanged='onDimChanged' />
+    </div>
   </section>
 </template>
 
 <script>
+import Slider from '../components/slider'
+
 export default {
-  props: [ 'i', 'box', 'controller', 'j', 'led' ]
+  components: { Slider },
+  props: [ 'i', 'box', 'controller', 'j', 'led' ],
+  methods: {
+    onDimChanged(value) {
+      console.log(`dim changed ${value}`)
+    }
+  },
 }
 </script>
 
@@ -52,5 +63,9 @@ export default {
 
 .off
   background-image: url('~/assets/img/lightoff.svg')
+
+#slider
+  width: 100%
+  height: 15pt
 
 </style>

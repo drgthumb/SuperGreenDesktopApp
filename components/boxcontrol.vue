@@ -61,6 +61,7 @@ export default {
   flex-wrap: wrap
   display: flex
   background-color: #f6f6f6
+  padding: 20pt 15pt
 
 .led
   flex: 50%
