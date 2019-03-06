@@ -3,7 +3,7 @@
     <b>Live view</b>
     <div :id='$style.liveviews'>
       <div v-for='source in sources' :class='$style.liveview' :style='{"background-image": `url(${source.url})`}' v-on:click='open_pic(source)'>
-        <div v-on:click='remove_source(source)'>X</div>
+        <div><img v-on:click='evt => remove_source(evt, source)' src='~/assets/img/remove-timelapse.svg' /></div>
       </div>
       <div :class='`${$style.liveview} ${$style.add}`' v-on:click='show_add_source'></div>
       <div v-if='showing_add_source' :id='$style.add_source'>
@@ -42,7 +42,9 @@ export default {
         url: this.$refs.name.value,
       })
     },
-    remove_source(source) {
+    remove_source(evt, source) {
+      evt.preventDefault()
+      evt.stopPropagation()
       this.$store.commit('liveviews/remove_source', source)
     },
     open_pic(source) {
@@ -71,6 +73,15 @@ export default {
   background-size: contain
   cursor: pointer
   margin: 0pt 4pt 4pt 0
+
+.liveview > div > img
+  margin-top: 4pt
+  margin-left: 2pt
+  opacity: 0.5
+  transition: opacity 0.2s
+
+.liveview > div > img:hover
+  opacity: 1
 
 .add
   background-image: url('~/assets/img/add-timelapse.svg')
