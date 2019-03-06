@@ -1,6 +1,6 @@
 <template>
   <section v-if='controller' :id='$style.container'>
-    <div v-for='(box, i) in controller.boxes'>
+    <div v-for='(box, i) in controller.boxes' v-if='box.enabled.value'>
       <Box :i='i' :controller='controller' :box='box' :key='i' />
     </div>
   </section>
@@ -27,5 +27,8 @@ export default {
   flex-direction: column
   background-color: #efefef
   overflow-y: auto
+
+#container > div
+  max-width: 800pt
 
 </style>

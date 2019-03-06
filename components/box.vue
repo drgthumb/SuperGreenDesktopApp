@@ -44,6 +44,7 @@ export default {
 
 .left_body
   flex: 0.7
+  max-width: 250pt
 
 .right_body
   flex: 1
