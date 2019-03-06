@@ -2,7 +2,9 @@
   <section :id='$style.container'>
     <b>Live view</b>
     <div :id='$style.liveviews'>
-      <div v-for='source in sources' :class='$style.liveview' :style='{"background-image": `url(${source.url})`}'></div>
+      <div v-for='source in sources' :class='$style.liveview' :style='{"background-image": `url(${source.url})`}' v-on:click='open_pic(source)'>
+        <div v-on:click='remove_source(source)'>X</div>
+      </div>
       <div :class='`${$style.liveview} ${$style.add}`' v-on:click='show_add_source'></div>
       <div v-if='showing_add_source' :id='$style.add_source'>
         <input type='text' ref='name' />
@@ -21,8 +23,9 @@ export default {
   computed: {
     sources() {
       const controller = this.$props.controller,
-            box = this.$props.box
-      return this.$store.getters['liveviews/sources'](controller.broker_clientid)
+            box = this.$props.box,
+            i = this.$props.i
+      return this.$store.getters['liveviews/sources'](`${controller.broker_clientid.value}.${i}.`)
     }
   },
   methods: {
@@ -30,13 +33,20 @@ export default {
       this.$data.showing_add_source = !this.$data.showing_add_source
     },
     add_source() {
-      const controller = this.$props.controller
-      console.log(this.$refs.name.value)
+      const controller = this.$props.controller,
+            i = this.$props.i,
+            sources = this.sources
       this.$data.showing_add_source = false
       this.$store.commit('liveviews/add_source', {
-        id: 'test',
+        id: `${controller.broker_clientid.value}.${i}.${sources.length}`,
         url: this.$refs.name.value,
       })
+    },
+    remove_source(source) {
+      this.$store.commit('liveviews/remove_source', source)
+    },
+    open_pic(source) {
+      window.open(source.url, source.id)
     },
   },
 }
@@ -51,14 +61,16 @@ export default {
   position: relative
   display: flex
   margin-top: 10pt
+  flex-wrap: wrap;
 
 .liveview
-  width: 120pt
-  height: 90pt
+  width: 140pt
+  height: 110pt
   background-position: center
   background-repeat: no-repeat
   background-size: contain
   cursor: pointer
+  margin: 0pt 4pt 4pt 0
 
 .add
   background-image: url('~/assets/img/add-timelapse.svg')
