@@ -2,6 +2,7 @@ import axios from 'axios'
 import version_config from '../version_config.json'
 
 const controller_defaults = {
+  discovery_url: '',
   loaded: false,
   i2c: [],
   leds: [],
@@ -13,6 +14,7 @@ const new_loadable_key = function(key) {
   return {
     value: def,
     loaded: false,
+    loading: true,
     config_key: key,
   }
 }
@@ -41,7 +43,10 @@ for (let i in version_config.keys) {
 
 export const state = () => ({
   searching_ap: false,
+  search_ap_is_sta: false,
   search_ap_failed: false,
+  search_ap_failed_reason: null,
+  search_ap_url: '192.168.4.1',
   found_ap_controller: null,
   controllers: [],
   selected: '',
@@ -52,7 +57,13 @@ const getById = function(state, id) {
   return controllers.find((c) => c.broker_clientid.value == id)
 }
 
+const setById = function(state, id, controller) {
+  const i = state.controllers.findIndex((c) => c.broker_clientid.value == id)
+  state.controllers[i] = controller
+}
+
 export const getters = {
+  getById: (state) => (id) => getById(state, id),
   getSelected(state) {
     const selected = state.selected
     return getById(state, selected)
@@ -60,13 +71,18 @@ export const getters = {
 }
 
 export const mutations = {
+  configure_search_ap_controller(state, { url, is_sta }) {
+    state.search_ap_url = url
+    state.search_ap_is_sta = is_sta
+  },
   start_search_ap_controller(state) {
     state.searching_ap = true
   },
-  end_search_ap_controller(state, controller, error) {
+  end_search_ap_controller(state, { controller, error }) {
     state.searching_ap = false
-    state.search_ap_failed = !!error 
     state.found_ap_controller = controller
+    state.search_ap_failed = !!error 
+    state.search_ap_failed_reason = error 
   },
   add_controller(state, controller) {
     state.controllers.push(controller)
@@ -77,50 +93,152 @@ export const mutations = {
   set_loaded(state, id) {
     let controller = getById(state, id)
     controller.loaded = true
+    setById(state, id, controller)
   },
-  loaded_controller_param(state, id, key, value) {
+  loading_controller_param(state, { id, key }) {
     let controller = getById(state, id)
-    controller[key].value = value
-    controller[key].loaded = true
+    controller[key] = Object.assign({}, controller[key], {loading: true})
+    setById(state, id, controller)
   },
-  loaded_box_param(state, id, i, key, value) {
+  loading_box_param(state, { id, i, key }) {
     let controller = getById(state, id)
-    controller.boxes[i][key].value = value
-    controller.boxes[i][key].loaded = true
+    controller.boxes[i][key] = Object.assign({}, controller.boxes[i][key], {loading: true})
+    setById(state, id, controller)
   },
-  loaded_led_param(state, id, i, key, value) {
+  loading_led_param(state, { id, i, key }) {
     let controller = getById(state, id)
-    controller.leds[i][key].value = value
-    controller.leds[i][key].loaded = true
+    controller.leds[i][key] = Object.assign({}, controller.leds[i][key], {loading: true})
+    setById(state, id, controller)
   },
-  loaded_i2c_param(state, id, i, key, value) {
+  loading_i2c_param(state, { id, i, key }) {
     let controller = getById(state, id)
-    controller.i2c[i][key].value = value
-    controller.i2c[i][key].loaded = true
+    controller.i2c[i][key] = Object.assign({}, controller.i2c[i][key], {loading: true})
+    setById(state, id, controller)
+  },
+  loaded_controller_param(state, { id, key, value }) {
+    let controller = getById(state, id)
+    controller[key] = Object.assign({}, controller[key], {value, loaded: true, loading: false})
+    setById(state, id, controller)
+  },
+  loaded_box_param(state, { id, i, key, value }) {
+    let controller = getById(state, id)
+    controller.boxes[i][key] = Object.assign({}, controller.boxes[i][key], {value, loaded: true, loading: false})
+    setById(state, id, controller)
+  },
+  loaded_led_param(state, { id, i, key, value }) {
+    let controller = getById(state, id)
+    controller.leds[i][key] = Object.assign({}, controller.leds[i][key], {value, loaded: true, loading: false})
+    setById(state, id, controller)
+  },
+  loaded_i2c_param(state, { id, i, key, value }) {
+    let controller = getById(state, id)
+    controller.i2c[i][key] = Object.assign({}, controller.i2c[i][key], {value, loaded: true, loading: false})
+    setById(state, id, controller)
   },
 }
 
-export const actions = {
-  search_ap_controller(context) {
-    context.commit('start_search_ap_controller')
-    setTimeout(() => {
-
-      let controller = Object.assign({}, controller_defaults)
-      let broker_clientid = ''+parseInt(Math.random() * 10000)
-      controller.device_name.value = 'Office'
-      controller.device_name.loaded = true
-      controller.broker_clientid.value = broker_clientid
-      controller.broker_clientid.loaded = true
-      context.commit('end_search_ap_controller', controller, null)
-
-      setTimeout(() => {
-
-        context.commit('add_controller', controller)
-        context.commit('set_selected', broker_clientid)
-        context.commit('set_loaded', broker_clientid, null)
-        context.commit('end_search_ap_controller', controller, null)
-
-      }, 3000)
-    }, 3000)
+const wait_for_controller = async function (url) {
+  for (let i = 0; i < 5; ++i) {
+    try {
+      const { data: name } = await axios.get(`http://${url}/s?k=DEVICE_NAME`, {timeout: 5000})
+      return name
+    } catch(e) {
+      console.log(e)
+    }
   }
+  return false
+}
+
+export const actions = {
+  // find controller at 192.168.4.1 and load device_name + broker_clientid
+  search_ap_controller(context) {
+    (async function() {
+      let name, url = context.state.search_ap_url;
+      context.commit('start_search_ap_controller')
+      if ((name = await wait_for_controller(url)) == false) {
+        context.commit('end_search_ap_controller', {controller: null, error: 'No controller found'})
+        return
+      }
+      let controller = Object.assign({}, controller_defaults, {device_name: {value: name, loaded: true}, discovery_url: url})
+      context.commit('end_search_ap_controller', {controller, error: null})
+      const { data: broker_clientid } = await axios.get(`http://${url}/s?k=BROKER_CLIENTID`)
+      controller = Object.assign({}, controller, {loaded: true, broker_clientid: {value: broker_clientid, loaded: true}})
+      context.commit('add_controller', controller)
+      context.commit('set_selected', broker_clientid)
+      context.commit('set_loaded', broker_clientid)
+      context.commit('end_search_ap_controller', {controller, error: null})
+    })()
+  },
+  load_controller_param(context, { id, key }) {
+    (async function() {
+      const controller = getById(context.state, id),
+            config = controller[key].config_key
+      context.commit('loading_controller_param', {id, key})
+      const { data: value } = await axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}`)
+      context.commit('loaded_controller_param', {id, key, value: config.integer ? parseInt(value) : value})
+    })()
+  },
+  load_box_param(context, { id, i, key }) {
+    (async function() {
+      const controller = getById(context.state, id),
+            config = controller.boxes[i][key].config_key
+      context.commit('loading_box_param', {id, i, key})
+      const { data: value } = await axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}`)
+      context.commit('loaded_box_param', {id, i, key, value: config.integer ? parseInt(value) : value})
+    })()
+  },
+  load_led_param(context, { id, i, key }) {
+    (async function() {
+      const controller = getById(context.state, id),
+            config = controller.leds[i][key].config_key
+      context.commit('loading_led_param', {id, i, key})
+      const { data: value } = await axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}`)
+      context.commit('loaded_led_param', {id, i, key, value: config.integer ? parseInt(value) : value})
+    })()
+  },
+  load_i2c_param(context, { id, i, key }) {
+    (async function() {
+      let controller = getById(context.state, id),
+          config = controller.i2c[i][key].config_key
+      context.commit('loading_i2c_param', id, i, key)
+      const { data: value } = await axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}`)
+      context.commit('loaded_i2c_param', {id, i, key, value: config.integer ? parseInt(value) : value})
+    })()
+  },
+  set_controller_param(context, { id, key, value }) {
+    (async function() {
+      const controller = getById(context.state, id),
+            config = controller[key].config_key
+      context.commit('loading_controller_param', {id, key})
+      await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}&v=${value}`)
+      context.dispatch('load_controller_param', {id, key})
+    })()
+  },
+  set_box_param(context, { id, i, key, value }) {
+    (async function() {
+      const controller = getById(context.state, id),
+            config = controller.boxes[i][key].config_key
+      context.commit('loading_box_param', {id, i, key})
+      await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}&v=${value}`)
+      context.dispatch('load_box_param', {id, i, key})
+    })()
+  },
+  set_led_param(context, { id, i, key, value }) {
+    (async function() {
+      const controller = getById(context.state, id),
+            config = controller.leds[i][key].config_key
+      context.commit('loading_led_param', {id, i, key})
+      await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}&v=${value}`)
+      context.dispatch('load_led_param', {id, i, key})
+    })()
+  },
+  set_i2c_param(context, { id, i, key }) {
+    (async function() {
+      let controller = getById(context.state, id),
+          config = controller.i2c[i][key].config_key
+      context.commit('loading_i2c_param', id, i, key)
+      await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}&v=${value}`)
+      context.dispatch('load_i2c_param', {id, i, key})
+    })()
+  },
 }

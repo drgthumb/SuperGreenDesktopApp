@@ -2,11 +2,11 @@
   <section :id='$style.container'>
     <b>{{ j + 1 }}</b>
     <div :id='$style.box'>
-      <div :class='`${$style.onoff} ${led.duty.value > 5 ? $style.on : $style.off}`'></div>
+      <div :class='`${$style.onoff} ${duty.value > 5 ? $style.on : $style.off}`'></div>
       <b>{{ led.duty.value }}%</b>
     </div>
     <div :id='$style.slider'>
-      <Slider :onValueChanged='onDimChanged' />
+      <Slider v-model='duty' />
     </div>
   </section>
 </template>
@@ -21,6 +21,26 @@ export default {
     onDimChanged(value) {
       console.log(`dim changed ${value}`)
     }
+  },
+  computed: {
+    duty: {
+      get() {
+        return this.$props.led.duty.value
+      },
+      set(value) {
+        const { 
+          i, box, controller, j, led
+        } = this.$props
+        this.$store.dispatch('controllers/set_led_param', {id: controller.broker_clientid.value, i: j, key: 'duty', value: Math.round(value * 100)}) 
+      },
+    },
+  },
+  mounted() {
+    const { 
+      i, box, controller, j, led
+    } = this.$props
+    this.$store.dispatch('controllers/load_led_param', {id: controller.broker_clientid.value, i: j, key: 'enabled'})
+    this.$store.dispatch('controllers/load_led_param', {id: controller.broker_clientid.value, i: j, key: 'duty'})
   },
 }
 </script>

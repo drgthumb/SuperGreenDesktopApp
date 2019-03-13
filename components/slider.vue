@@ -7,9 +7,8 @@
 
 <script>
 export default {
-  props: [ 'onValueChanged' ],
+  props: [ 'value' ],
   data: () => ({
-    value: 0,
     mouseValue: 0,
     mouseX: 0,
     mouseState: '',
@@ -26,14 +25,14 @@ export default {
 
     onMouseUp(evt) {
       if (this.$data.mouseState == 'down') {
-        this.$props.onValueChanged(this.$data.value)
+        this.$emit('input', this.$data.value)
       }
       this.$data.mouseState = ''
     },
 
     onMouseOut(evt) {
       if (this.$data.mouseState == 'down') {
-        this.$props.onValueChanged(this.$data.value)
+        this.$emit('input', this.$data.value)
       }
       this.$data.mouseState = ''
     },

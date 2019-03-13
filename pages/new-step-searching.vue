@@ -1,5 +1,8 @@
 <template>
   <section :id='$style.container'>
+    <section :id='$style.top'>
+      <CloseButton />
+    </section>
     <section :id='$style.body'>
       <img src="~/assets/img/loading.png">
       <h3>Pease wait...</h3>
@@ -8,10 +11,11 @@
 </template>
 
 <script>
+import CloseButton from '../components/closebutton'
 import NextButton from '../components/nextbutton'
 
 export default {
-  components: { NextButton, },
+  components: { CloseButton, NextButton, },
   layout: 'fullscreen',
   mounted() {
     this.$store.dispatch('controllers/search_ap_controller')
@@ -28,7 +32,7 @@ export default {
         this.$router.push('/new-step-notfound')
       }
     })
-  }
+  },
 }
 </script>
 
@@ -38,6 +42,10 @@ export default {
   display: flex
   flex-direction: column
   min-height: 100vh
+
+#top
+  display: flex
+  justify-content: flex-end
 
 #body
   display: flex

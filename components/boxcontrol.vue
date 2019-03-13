@@ -3,9 +3,9 @@
     <b>Control</b>
     <div :id='$style.control'>
       <div :id='$style.boxonoff'>
-        On
-        <div :class='`${$style.onoff} ${(box.enabled ? $style.on : $style.off)}`' v-on:click='toggleOnOff()'></div>
         Off
+        <div :class='`${$style.onoff} ${(box.enabled ? $style.on : $style.off)}`' v-on:click='toggleOnOff()'></div>
+        On
       </div>
       <div :id='$style.leds'>
         <div v-for='(led, j) in controller.leds' v-if='led.box.value == i' :key='j' :class='$style.led'>
@@ -35,6 +35,12 @@ export default {
     onBlowerChanged(value) {
       console.log(value)
     }
+  },
+  mounted() {
+    const { 
+      i, box, controller
+    } = this.$props
+    this.$store.dispatch('controllers/load_box_param', {id: controller.broker_clientid.value, i: i, key: 'enabled'})
   },
 }
 </script>

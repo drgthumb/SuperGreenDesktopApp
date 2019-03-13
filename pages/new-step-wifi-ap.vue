@@ -1,5 +1,8 @@
 <template>
   <section :id='$style.container'>
+    <section :id='$style.top'>
+      <CloseButton />
+    </section>
     <section :id='$style.body'>
       <img src="~/assets/img/wifi-icon.png">
       <section>
@@ -16,10 +19,11 @@
 </template>
 
 <script>
+import CloseButton from '../components/closebutton'
 import NextButton from '../components/nextbutton'
 
 export default {
-  components: { NextButton, },
+  components: { CloseButton, NextButton, },
   layout: 'fullscreen',
   methods: {
     onNext(e) {
@@ -34,6 +38,10 @@ export default {
   display: flex
   flex-direction: column
   min-height: 100vh
+
+#top
+  display: flex
+  justify-content: flex-end
 
 #body
   display: flex
