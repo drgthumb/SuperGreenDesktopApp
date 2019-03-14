@@ -14,7 +14,7 @@
       </div>
       <div :id='$style.blower'>
         <img src='~/assets/img/vent-small.svg' />
-        <div :id='$style.sliderw'><Slider :onValueChanged='onBlowerChanged' /></div>
+        <div :id='$style.sliderw'><Slider v-model='blower' /></div>
         <img src='~/assets/img/vent-big.svg' />
       </div>
     </div>
@@ -28,19 +28,30 @@ import Slider from '../components/slider'
 export default {
   components: { LedControl, Slider, },
   props: [ 'i', 'box', 'controller', ],
+  computed: {
+    blower: {
+      get() {
+        return this.$props.box.blower.value
+      },
+      set(value) {
+       const { 
+          i, box, controller,
+        } = this.$props
+        this.$store.dispatch('controllers/set_box_param', {id: controller.broker_clientid.value, i, key: 'blower', value: Math.round(value)}) 
+      },
+    },
+  },
   methods: {
     toggleOnOff() {
       console.log('toggleOnOff')
     },
-    onBlowerChanged(value) {
-      console.log(value)
-    }
   },
   mounted() {
     const { 
       i, box, controller
     } = this.$props
     this.$store.dispatch('controllers/load_box_param', {id: controller.broker_clientid.value, i: i, key: 'enabled'})
+    this.$store.dispatch('controllers/load_box_param', {id: controller.broker_clientid.value, i: i, key: 'blower'})
   },
 }
 </script>

@@ -1,49 +1,28 @@
 <template>
-  <section :id='$style.container' v-on:mousedown='onMouseDown' v-on:mouseup='onMouseUp' v-on:mouseout='onMouseOut' v-on:mousemove='onMouseMove'>
-    <div :id='$style.course'></div>
-    <div :id='$style.plot' :style="{left: `${mouseX}px`}"></div>
+  <section :id='$style.container'>
+    <vue-slider :min='0' :max='100' v-model='vcomp' :id='$style.slider' width='100%' />
   </section>
 </template>
 
 <script>
+import VueSlider from 'vue-slider-component'
+import 'vue-slider-component/theme/antd.css'
+
 export default {
   props: [ 'value' ],
-  data: () => ({
-    mouseValue: 0,
-    mouseX: 0,
-    mouseState: '',
-  }),
-  methods: {
-    preventDefault(evt) {
-      evt.preventDefault()
-    },
-    onMouseDown(evt) {
-      this.$data.mouseState = 'down'
-      this.$data.value = this.$data.mouseValue
-      this.$data.mouseX = evt.layerX
-    },
-
-    onMouseUp(evt) {
-      if (this.$data.mouseState == 'down') {
-        this.$emit('input', this.$data.value)
-      }
-      this.$data.mouseState = ''
-    },
-
-    onMouseOut(evt) {
-      if (this.$data.mouseState == 'down') {
-        this.$emit('input', this.$data.value)
-      }
-      this.$data.mouseState = ''
-    },
-
-    onMouseMove(evt) {
-      this.$data.mouseValue = evt.layerX / evt.toElement.clientWidth
-      if (this.$data.mouseState == 'down') {
-        this.$data.value = this.$data.mouseValue
-        this.$data.mouseX = evt.layerX
-      }
-    },
+  components: {
+    VueSlider,
+  },
+  computed: {
+    vcomp: {
+      get() {
+        return this.$props.value
+      },
+      set(v) {
+        console.log(v)
+        this.$emit('input', v)
+      },
+    }
   }
 }
 </script>
@@ -51,32 +30,13 @@ export default {
 <style module lang=stylus>
 
 #container
-  position: relative
   flex: 1
   display: flex
   align-items: center
   justify-content: center
-  width: 100%
-  height: 100%
   cursor: pointer
-
-#course
+  
+#slider
   width: 100%
-  height: 3.3pt
-  border-radius: 1.65pt
-  background-color: #c4c4c4
-
-#plot
-  position: absolute
-  background-image: url('~/assets/img/plot.svg')
-  top: 50%
-  width: 10pt
-  height: 10pt
-  margin-top: -5pt
-  margin-left: -5pt
-  background-repeat: no-repeat
-  background-size: contain
-  background-position: center
-  pointer-events: none
 
 </style>

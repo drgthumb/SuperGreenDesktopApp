@@ -59,7 +59,7 @@ const getById = function(state, id) {
 
 const setById = function(state, id, controller) {
   const i = state.controllers.findIndex((c) => c.broker_clientid.value == id)
-  state.controllers[i] = controller
+  state.controllers = Object.assign([], state.controllers, { [i]: controller }) // TODO is this useful ? i think not..
 }
 
 export const getters = {

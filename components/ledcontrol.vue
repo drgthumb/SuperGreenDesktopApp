@@ -17,11 +17,6 @@ import Slider from '../components/slider'
 export default {
   components: { Slider },
   props: [ 'i', 'box', 'controller', 'j', 'led' ],
-  methods: {
-    onDimChanged(value) {
-      console.log(`dim changed ${value}`)
-    }
-  },
   computed: {
     duty: {
       get() {
@@ -31,7 +26,7 @@ export default {
         const { 
           i, box, controller, j, led
         } = this.$props
-        this.$store.dispatch('controllers/set_led_param', {id: controller.broker_clientid.value, i: j, key: 'duty', value: Math.round(value * 100)}) 
+        this.$store.dispatch('controllers/set_led_param', {id: controller.broker_clientid.value, i: j, key: 'duty', value: Math.round(value)}) 
       },
     },
   },
