@@ -1,6 +1,6 @@
 <template>
   <section v-if='controller' :id='$style.container'>
-    <div v-for='(box, i) in controller.boxes' v-if='box.enabled.value'>
+    <div v-for='(box, i) in controller.boxes'>
       <Box :i='i' :controller='controller' :box='box' :key='i' />
     </div>
   </section>

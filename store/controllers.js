@@ -161,12 +161,14 @@ export const actions = {
       }
       let controller = Object.assign({}, controller_defaults, {device_name: {value: name, loaded: true}, discovery_url: url})
       context.commit('end_search_ap_controller', {controller, error: null})
-      const { data: broker_clientid } = await axios.get(`http://${url}/s?k=BROKER_CLIENTID`)
-      controller = Object.assign({}, controller, {loaded: true, broker_clientid: {value: broker_clientid, loaded: true}})
-      context.commit('add_controller', controller)
-      context.commit('set_selected', broker_clientid)
-      context.commit('set_loaded', broker_clientid)
-      context.commit('end_search_ap_controller', {controller, error: null})
+      setTimeout(async () => {
+        const { data: broker_clientid } = await axios.get(`http://${url}/s?k=BROKER_CLIENTID`)
+        controller = Object.assign({}, controller, {loaded: true, broker_clientid: {value: broker_clientid, loaded: true}})
+        context.commit('add_controller', controller)
+        context.commit('set_selected', broker_clientid)
+        context.commit('set_loaded', broker_clientid)
+        context.commit('end_search_ap_controller', {controller, error: null})
+      }, 500)
     })()
   },
   load_controller_param(context, { id, key }) {

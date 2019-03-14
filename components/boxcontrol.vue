@@ -4,7 +4,7 @@
     <div :id='$style.control'>
       <div :id='$style.boxonoff'>
         Off
-        <div :class='`${$style.onoff} ${(box.enabled ? $style.on : $style.off)}`' v-on:click='toggleOnOff()'></div>
+        <div :class='`${$style.onoff} ${(box.enabled.value ? $style.on : $style.off)}`' v-on:click='toggleOnOff()'></div>
         On
       </div>
       <div :id='$style.leds'>
@@ -43,7 +43,10 @@ export default {
   },
   methods: {
     toggleOnOff() {
-      console.log('toggleOnOff')
+       const { 
+          i, box, controller,
+        } = this.$props
+        this.$store.dispatch('controllers/set_box_param', {id: controller.broker_clientid.value, i, key: 'enabled', value: (box.enabled.value == 1 ? 0 : 1)}) 
     },
   },
   mounted() {
