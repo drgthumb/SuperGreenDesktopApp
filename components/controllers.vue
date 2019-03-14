@@ -8,18 +8,18 @@
       </div>
     </div>
     <div :id='$style.add'>
-      <img src='~/assets/img/add.svg' v-on:click="show" />
-      <div v-if='overlay':id='$style.overlay'>
-        <b>Add controller</b>
+      <div :id='$style.overlay' :class='overlay ? $style.show : $style.hide'>
+        <img :class='$style.add_img' src='~/assets/img/remove.svg' v-on:click="show" />
         <div v-on:click='first'>
-          First time setup
+          <b>New one</b>
         </div>
         <div>
-          Wifi
+          <b>Already connected</b>:
           <input v-model='url' type='text' placeholder='IP or name.local' />
           <button v-on:click='wifi'>ok</button>
         </div>
       </div>
+      <img :class='$style.add_img' src='~/assets/img/add.svg' v-on:click="show" />
     </div>
   </section>
 </template>
@@ -49,6 +49,7 @@ export default {
     },
     show() {
       this.$data.overlay = !this.$data.overlay
+      return evt => evt.preventDefault()
     },
     first() {
       this.$store.commit('controllers/configure_search_ap_controller', {url: '192.168.4.1', is_sta: false})
@@ -97,7 +98,7 @@ export default {
   cursor: pointer
   transition: opacity .2s
 
-#add > img
+.add_img
   width: 35pt
   margin: 5pt
 
@@ -108,7 +109,6 @@ export default {
   opacity: 0.2
 
 .selected
-  position: relative
   background-color: #020202
 
 .selected::after
@@ -131,22 +131,28 @@ export default {
   color: #FF4B4B
 
 #overlay
+  display: flex
   position: absolute
-  left: 100%
+  left: 0
   bottom: 0
-  background-color: #fcfcfc
+  width: 100vw
+  background-color: #454545
   border-radius: 2pt
-  border: 1px solid #ebebeb
-  margin: 3pt
+  z-index: 10
+  color: white
+  transition: margin-left 0.2s, opacity 0.5s
 
 #overlay > b
   display: block
   margin: 5pt
 
 #overlay > div
-  padding: 10pt 5pt
+  display: flex
   font-size: 0.8em
-  border-bottom: 1px solid #dedede
+  align-items: center
+  justify-content: center
+  margin-left: 20pt
+  padding: 0 10pt
 
 #overlay input
   margin: 10pt 5pt
@@ -154,8 +160,16 @@ export default {
   background-color: #fcfcfc
   border-radius: 2pt
   border: 1px solid #dedede
-  
+
 #overlay > div:hover
-  background-color: #dedede
+  background-color: #020202
+
+.show
+  margin-left: 0
+  opacity: 1
+
+.hide
+  margin-left: -100vw
+  opacity: 0
 
 </style>

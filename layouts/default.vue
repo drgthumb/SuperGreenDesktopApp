@@ -23,6 +23,7 @@ export default {
 
 #container
   flex: 1
+  position: relative
   display: flex
   width: 100vw
   height: 100vh
