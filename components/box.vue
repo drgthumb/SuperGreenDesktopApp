@@ -31,7 +31,7 @@ export default {
           i, box, controller,
         } = this.$props
         this.$store.dispatch('controllers/set_box_param', {id: controller.broker_clientid.value, i, key: 'enabled', value: 1}) 
-        this.$store.dispatch('controllers/set_box_param', {id: controller.broker_clientid.value, i, key: 'timer_type', value: 2}) 
+        this.$store.dispatch('controllers/set_box_param', {id: controller.broker_clientid.value, i, key: 'timer_type', value: 1}) 
     },
   }
 }

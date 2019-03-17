@@ -36,6 +36,7 @@ export default {
     } = this.$props
     this.$store.dispatch('controllers/load_led_param', {id: controller.broker_clientid.value, i: j, key: 'enabled'})
     this.$store.dispatch('controllers/load_led_param', {id: controller.broker_clientid.value, i: j, key: 'duty'})
+    this.$store.dispatch('controllers/load_led_param', {id: controller.broker_clientid.value, i: j, key: 'box'})
   },
 }
 </script>
