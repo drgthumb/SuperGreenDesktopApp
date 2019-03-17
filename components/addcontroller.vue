@@ -23,7 +23,7 @@ export default {
   methods: {
     first() {
       this.$store.commit('controllers/configure_search_ap_controller', {url: '192.168.4.1', is_sta: false})
-      this.$router.push('/new-step-wifi-ap')
+      this.$router.push('/new-step-plug')
     },
     wifi() {
       this.$store.commit('controllers/configure_search_ap_controller', {url: '', is_sta: true})
