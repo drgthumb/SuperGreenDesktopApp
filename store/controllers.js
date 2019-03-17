@@ -21,32 +21,28 @@ const new_loadable_key = function(key) {
 
 const schedule_promise = (n) => {
   let loading_param_promise = Promise.resolve(),
-      promises = [],
-      loading_param_promise_count = 0
+      promises = []
   return function(req_func) {
     let resolve, reject
     const p = new Promise((res, rej) => {resolve = res; reject = rej})
-    if ((loading_param_promise_count % n) == 0) {
-      console.log(`schedule_promise ${n} new promise`)
-      loading_param_promise = Promise.all(promises)
-      promises = []
-    }
     loading_param_promise.then(async () => {
       try {
-        console.log(`schedule_promise ${n} resolve`)
         resolve(await req_func())
       } catch(e) {
-        console.log(`schedule_promise ${n} reject ${e}`)
         reject(e)
       }
     })
     promises.push(p)
-    ++loading_param_promise_count
+    if (promises.length >= n) {
+      loading_param_promise = Promise.all(promises)
+      promises = []
+    }
+
     return p
   }
 }
 
-const limit_3_concurrent = schedule_promise(3)
+const controller_chain = schedule_promise(3)
 
 for (let i in version_config.keys) {
   const key = version_config.keys[i]
@@ -193,8 +189,8 @@ export const actions = {
     })
     context.commit('end_search_ap_controller', {controller, error: null})
     setTimeout(async () => {
-      const { data: broker_clientid } = await limit_3_concurrent(async () => axios.get(`http://${url}/s?k=BROKER_CLIENTID`)),
-            { data: state } = await limit_3_concurrent(async () => axios.get(`http://${url}/i?k=STATE`))
+      const { data: broker_clientid } = await controller_chain(async () => axios.get(`http://${url}/s?k=BROKER_CLIENTID`, {timeout: 5000})),
+            { data: state } = await controller_chain(async () => axios.get(`http://${url}/i?k=STATE`, {timeout: 5000}))
       controller = Object.assign({}, controller, {
         loaded: true,
         broker_clientid: Object.assign({}, controller.broker_clientid, {
@@ -214,56 +210,56 @@ export const actions = {
     const controller = getById(context.state, id),
           config = controller[key].config_key
     context.commit('loading_controller_param', {id, key})
-    const { data: value } = await limit_3_concurrent(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}`))
+    const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}`, {timeout: 5000}))
     context.commit('loaded_controller_param', {id, key, value: config.integer ? parseInt(value) : value})
   },
   async load_box_param(context, { id, i, key }) {
     const controller = getById(context.state, id),
           config = controller.boxes[i][key].config_key
     context.commit('loading_box_param', {id, i, key})
-    const { data: value } = await limit_3_concurrent(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}`))
+    const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}`, {timeout: 5000}))
     context.commit('loaded_box_param', {id, i, key, value: config.integer ? parseInt(value) : value})
   },
   async load_led_param(context, { id, i, key }) {
     const controller = getById(context.state, id),
           config = controller.leds[i][key].config_key
     context.commit('loading_led_param', {id, i, key})
-    const { data: value } = await limit_3_concurrent(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}`))
+    const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}`, {timeout: 5000}))
     context.commit('loaded_led_param', {id, i, key, value: config.integer ? parseInt(value) : value})
   },
   async load_i2c_param(context, { id, i, key }) {
     let controller = getById(context.state, id),
       config = controller.i2c[i][key].config_key
     context.commit('loading_i2c_param', id, i, key)
-    const { data: value } = await limit_3_concurrent(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}`))
+    const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}`, {timeout: 5000}))
     context.commit('loaded_i2c_param', {id, i, key, value: config.integer ? parseInt(value) : value})
   },
   async set_controller_param(context, { id, key, value }) {
     const controller = getById(context.state, id),
           config = controller[key].config_key
     context.commit('loading_controller_param', {id, key})
-    limit_3_concurrent(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}&v=${value}`))
-    context.dispatch('load_controller_param', {id, key})
+    await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
+    await context.dispatch('load_controller_param', {id, key})
   },
   async set_box_param(context, { id, i, key, value }) {
     const controller = getById(context.state, id),
           config = controller.boxes[i][key].config_key
     context.commit('loading_box_param', {id, i, key})
-    limit_3_concurrent(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}&v=${value}`))
-    context.dispatch('load_box_param', {id, i, key})
+    await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
+    await context.dispatch('load_box_param', {id, i, key})
   },
   async set_led_param(context, { id, i, key, value }) {
     const controller = getById(context.state, id),
           config = controller.leds[i][key].config_key
     context.commit('loading_led_param', {id, i, key})
-    limit_3_concurrent(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}&v=${value}`))
-    context.dispatch('load_led_param', {id, i, key})
+    await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
+    await context.dispatch('load_led_param', {id, i, key})
   },
   async set_i2c_param(context, { id, i, key }) {
     let controller = getById(context.state, id),
         config = controller.i2c[i][key].config_key
     context.commit('loading_i2c_param', id, i, key)
-    limit_3_concurrent(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}&v=${value}`))
-    context.dispatch('load_i2c_param', {id, i, key})
+    await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
+    await context.dispatch('load_i2c_param', {id, i, key})
   },
 }
