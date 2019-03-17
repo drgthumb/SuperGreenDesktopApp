@@ -1,5 +1,5 @@
 <template>
-	<section :id='$style.container'>
+  <section :id='$style.container'>
     <section :id='$style.menu'>
       <Logo margin='5pt' vertical=true size='1.2em' />
       <Controllers />
@@ -7,7 +7,7 @@
     <section :id='$style.body'>
       <nuxt />
     </section>
-	</section>
+  </section>
 </template>
 
 <script>

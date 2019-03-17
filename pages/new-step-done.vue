@@ -7,7 +7,7 @@
     </section>
 
     <section :id='$style.nav'>
-      <NextButton :to='controller.state.value == 0 ? "/first_setup_controller" : "/"' />
+      <NextButton :to='nextUrl' />
     </section>
   </section>
 </template>
@@ -21,7 +21,16 @@ export default {
   computed: {
     controller() {
       return this.$store.getters['controllers/getSelected']
-    }
+    },
+    nextUrl() {
+      const controller = this.controller
+      if (controller.state.value == 0) {
+        return '/setup-controller-preset'
+      } else if (controller.wifi_status.value == 4) {
+        return '/setup-controller-wifi-sta'
+      }
+      return '/'
+    },
   },
 }
 </script>

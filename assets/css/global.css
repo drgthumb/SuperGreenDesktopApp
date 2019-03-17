@@ -43,6 +43,12 @@ body {
 .page-enter, .page-leave-active {
   opacity: 0
 }
+.layout-enter-active, .layout-leave-active {
+  transition: opacity 0.2s;
+}
+.layout-enter, .layout-leave-active {
+  opacity: 0;
+}
 
 input[type=text] {
   border: 1pt solid #C2C2C2;

@@ -9,7 +9,7 @@
     </div>
 
     <section :id='$style.nav'>
-      <NextButton to='/' />
+      <NextButton to='/setup-controller-name' />
     </section>
   </section>
 </template>

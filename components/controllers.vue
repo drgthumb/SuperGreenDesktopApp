@@ -35,10 +35,13 @@ export default {
   methods: {
     select(controller) {
       if (controller.state.value == 0) {
-        this.$router.push('/first_setup_controller')
+        this.$router.push('/setup-controller-preset')
+      } else if (controller.wifi_status.value == 4) {
+        this.$router.push('/setup-controller-wifi-sta')
       } else {
         this.$router.push('/')
       }
+      //this.$router.push('/setup-controller-name')
       this.$store.commit('controllers/set_selected', controller.broker_clientid.value)
     },
     show() {
