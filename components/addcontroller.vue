@@ -23,11 +23,11 @@ export default {
   methods: {
     first() {
       this.$store.commit('controllers/configure_search_ap_controller', {url: '192.168.4.1', is_sta: false})
-      this.$router.push('/new-step-plug')
+      this.$router.push('/new-step-wifi-ap')
     },
     wifi() {
       this.$store.commit('controllers/configure_search_ap_controller', {url: '', is_sta: true})
-      this.$router.push('/new-step-plug')
+      this.$router.push('/new-step-wifi-sta')
     },
     shop() {
       window.open('https://supergreenlab.com')
