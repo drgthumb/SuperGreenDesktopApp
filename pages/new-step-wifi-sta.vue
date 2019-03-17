@@ -4,13 +4,12 @@
       <CloseButton />
     </section>
     <section :id='$style.body'>
-      <img src="~/assets/img/plug-driver.png">
-      <p>
-        Plug your driver’s power plug.
-      </p>
+      <img src="~/assets/img/wifi-icon.png">
+      <h3>Search the controller by it’s name:</h3>
+      <input v-model='url' type='text' placeholder='supergreendriver' />
     </section>
     <section :id='$style.nav'>
-      <NextButton v-on:click.native='onNext' :to='is_sta ? "/new-step-wifi-sta" : "/new-step-wifi-ap"' />
+      <NextButton v-on:click.native='onNext' to='/new-step-searching' />
     </section>
   </section>
 </template>
@@ -20,15 +19,16 @@ import CloseButton from '../components/closebutton'
 import NextButton from '../components/nextbutton'
 
 export default {
+  data() {
+    return {
+      url: '',
+    }
+  },
   components: { CloseButton, NextButton, },
   layout: 'fullscreen',
   methods: {
     onNext(e) {
-    }
-  },
-  computed: {
-    is_sta() {
-      return this.$store.state.controllers.search_ap_is_sta
+      this.$store.commit('controllers/configure_search_ap_controller', {url: this.$data.url, is_sta: true})
     }
   }
 }
@@ -51,10 +51,14 @@ export default {
   flex: 1
   justify-content: center
   align-items: center
-  text-align: center
 
 #body img
   max-height: 200pt
+  padding-bottom: 50pt
+
+#container input
+  margin: 10pt 0 0 0
+  min-width: 200pt
 
 #nav
   display: flex

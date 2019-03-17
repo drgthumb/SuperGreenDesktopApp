@@ -5,7 +5,7 @@
       <Controllers />
     </section>
     <section :id='$style.body'>
-      <nuxt/>
+      <nuxt />
     </section>
 	</section>
 </template>

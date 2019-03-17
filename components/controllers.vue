@@ -8,27 +8,21 @@
       </div>
     </div>
     <div :id='$style.add'>
+      <img :class='$style.add_img' :src='!overlay ? require("~/assets/img/add.svg") : require("~/assets/img/remove.svg")' v-on:click="show" />
       <div :id='$style.overlay' :class='overlay ? $style.show : $style.hide'>
-        <img :class='$style.add_img' src='~/assets/img/remove.svg' v-on:click="show" />
-        <div v-on:click='first'>
-          <b>New one</b>
-        </div>
-        <div>
-          <b>Already connected</b>:
-          <input v-model='url' type='text' placeholder='IP or name.local' />
-          <button v-on:click='wifi'>ok</button>
-        </div>
+        <AddController />
       </div>
-      <img :class='$style.add_img' src='~/assets/img/add.svg' v-on:click="show" />
     </div>
   </section>
 </template>
 
 <script>
+import AddController from './addcontroller'
+
 export default {
+  components: {AddController},
   data: () => ({
     overlay: false,
-    url: '',
   }),
   computed: {
     controllers() {
@@ -50,14 +44,6 @@ export default {
     show() {
       this.$data.overlay = !this.$data.overlay
       return evt => evt.preventDefault()
-    },
-    first() {
-      this.$store.commit('controllers/configure_search_ap_controller', {url: '192.168.4.1', is_sta: false})
-      this.$router.push('/new-step-plug')
-    },
-    wifi() {
-      this.$store.commit('controllers/configure_search_ap_controller', {url: this.$data.url, is_sta: true})
-      this.$router.push('/new-step-plug')
     },
   },
 }
@@ -95,10 +81,10 @@ export default {
 
 #add
   position: relative
-  cursor: pointer
   transition: opacity .2s
 
 .add_img
+  cursor: pointer
   width: 35pt
   margin: 5pt
 
@@ -140,32 +126,11 @@ export default {
   border-radius: 2pt
   z-index: 10
   color: white
+  padding-left: 15pt
   transition: margin-left 0.2s, opacity 0.5s
 
-#overlay > b
-  display: block
-  margin: 5pt
-
-#overlay > div
-  display: flex
-  font-size: 0.8em
-  align-items: center
-  justify-content: center
-  margin-left: 20pt
-  padding: 0 10pt
-
-#overlay input
-  margin: 10pt 5pt
-  padding: 5pt
-  background-color: #fcfcfc
-  border-radius: 2pt
-  border: 1px solid #dedede
-
-#overlay > div:hover
-  background-color: #020202
-
 .show
-  margin-left: 0
+  margin-left: 100%
   opacity: 1
 
 .hide

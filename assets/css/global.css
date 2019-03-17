@@ -18,6 +18,7 @@ body {
 	box-sizing: border-box;
 	margin: 0;
 }
+* { outline: 0 !important }
 .btn, .pointer {
 	cursor: pointer;
 }
@@ -41,4 +42,14 @@ body {
 }
 .page-enter, .page-leave-active {
   opacity: 0
+}
+
+input[type=text] {
+  border: 1pt solid #C2C2C2;
+  border-radius: 2pt;
+  padding: 6pt;
+}
+
+input[type=text]::placeholder {
+  color: #d2d2d2;
 }
