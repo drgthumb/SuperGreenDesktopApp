@@ -19,7 +19,6 @@ export default {
         return this.$props.value
       },
       set(v) {
-        console.log(v)
         this.$emit('input', v)
       },
     }
