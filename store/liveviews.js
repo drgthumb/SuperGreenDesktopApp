@@ -1,6 +1,14 @@
+const storage = {
+  sources: JSON.parse(window.localStorage.getItem('liveviews') || '{}'),
+}
+
 export const state = () => ({
-  sources: {}, // will move to flatten state later if needed performance wise
+  sources: storage.sources, // will move to flatten state later if needed performance wise
 })
+
+const storeState = (state) => {
+  window.localStorage.setItem('liveviews', JSON.stringify(state.sources))
+}
 
 export const mutations = {
   add_source(state, { id, url }) {
@@ -10,10 +18,12 @@ export const mutations = {
         url,
       }
     })
+    storeState(state)
   },
   remove_source(state, { id }) {
     const keys = Object.keys(state.sources).filter((k) => k != id) 
     state.sources = keys.reduce((acc, k) => {acc[k] = state.sources[k]; return acc}, {})
+    storeState(state)
   },
 }
 

@@ -1,6 +1,14 @@
+const storage = {
+  sources: JSON.parse(window.localStorage.getItem('graphs') || '{}'),
+}
+
 export const state = () => ({
-  sources: {}, // will move to flatten state later if needed performance wise
+  sources: storage.sources, // will move to flatten state later if needed performance wise
 })
+
+const storeState = (state) => {
+  window.localStorage.setItem('graphs', JSON.stringify(state.sources))
+}
 
 export const mutations = {
   init(state, id) {
@@ -11,6 +19,7 @@ export const mutations = {
         values: [],
       }
     })
+    storeState(state)
   },
   set_values(state, { id, values }) {
     state.sources = Object.assign({}, state.sources, {
@@ -20,6 +29,7 @@ export const mutations = {
         values: values,
       }
     })
+    storeState(state)
   },
 }
 
