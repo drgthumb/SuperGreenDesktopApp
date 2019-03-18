@@ -11,7 +11,7 @@
     <section :id='$style.nav'>
       <NextButton :onClick='writePreset' label='Configure' />
     </section>
-    <Loading v-if='loading' label='Uploading config..' />
+    <Loading v-if='loading' :label='`Uploading config.. ${parseInt(done/total*100)}%`' />
   </section>
 </template>
 
@@ -22,6 +22,8 @@ import Loading from '../components/loading'
 
 export default {
   data: () => ({
+    done: 0,
+    total: 0,
     selected: 0,
     loading: false
   }),
@@ -45,7 +47,11 @@ export default {
       const shoot_presets = (keys, type, req) =>
         Object.keys(keys)
           .filter((k) => typeof keys[k] == 'string' || typeof keys[k] == 'number')
-          .map((k) => this.$store.dispatch(`controllers/set_${type}_param`, req(k, keys[k])))
+          .map(async (k) => {
+            this.$data.total++
+            await this.$store.dispatch(`controllers/set_${type}_param`, req(k, keys[k]))
+            this.$data.done++
+          })
 
       let promises = shoot_presets(preset.keys, 'controller', (k, v) => ({id, key: k, value: v,}))
       preset.keys.leds.forEach((led, i) => promises.push(...shoot_presets(led, 'led', (k, v) => ({id, key: k, value: v, i}))))
