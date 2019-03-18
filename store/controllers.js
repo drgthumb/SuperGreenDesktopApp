@@ -67,6 +67,11 @@ for (let i in version_config.keys) {
   }
 }
 
+const storage = {
+  selected: window.localStorage.getItem('selected') || '',
+  controllers: JSON.parse(window.localStorage.getItem('controllers') || '[]'),
+}
+
 export const state = () => ({
   searching_ap: false,
   search_ap_is_sta: false,
@@ -75,9 +80,14 @@ export const state = () => ({
   search_ap_url: '192.168.4.1',
   search_n_tries: 0,
   found_ap_controller: null,
-  controllers: [],
-  selected: '',
+  controllers: storage.controllers,
+  selected: storage.selected,
 })
+
+const storeState = (state) => {
+  window.localStorage.setItem('selected', state.selected)
+  window.localStorage.setItem('controllers', JSON.stringify(state.controllers))
+}
 
 const getById = function(state, id) {
   const controllers = state.controllers
@@ -87,6 +97,7 @@ const getById = function(state, id) {
 const setById = function(state, id, controller) {
   const i = state.controllers.findIndex((c) => c.broker_clientid.value == id)
   state.controllers = Object.assign([], state.controllers, { [i]: controller }) // TODO is this useful ? i think not..
+  storeState(state)
 }
 
 export const getters = {
@@ -117,9 +128,11 @@ export const mutations = {
   },
   add_controller(state, controller) {
     state.controllers.push(controller)
+    storeState(state)
   },
   set_selected(state, id) {
     state.selected = id
+    storeState(state)
   },
   set_loaded(state, id) {
     let controller = getById(state, id)
@@ -197,7 +210,9 @@ export const actions = {
     context.commit('end_search_ap_controller', {controller, error: null})
     setTimeout(async () => {
       const { data: broker_clientid } = await controller_chain(async () => axios.get(`http://${url}/s?k=BROKER_CLIENTID`, {timeout: 5000})),
-            { data: state } = await controller_chain(async () => axios.get(`http://${url}/i?k=STATE`, {timeout: 5000}))
+            { data: state } = await controller_chain(async () => axios.get(`http://${url}/i?k=STATE`, {timeout: 5000})),
+            { data: wifi_ip } = await controller_chain(async () => axios.get(`http://${url}/s?k=WIFI_IP`, {timeout: 5000})),
+            { data: mdns_domain } = await controller_chain(async () => axios.get(`http://${url}/s?k=MDNS_DOMAIN`, {timeout: 5000}))
       controller = Object.assign({}, controller, {
         loaded: true,
         broker_clientid: Object.assign({}, controller.broker_clientid, {
@@ -205,6 +220,12 @@ export const actions = {
         }),
         state: Object.assign({}, controller.state, {
           value: state, loaded: true
+        }),
+        wifi_ip: Object.assign({}, controller.state, {
+          value: wifi_ip, loaded: true
+        }),
+        mdns_domain: Object.assign({}, controller.state, {
+          value: mdns_domain, loaded: true
         }),
       })
       context.commit('add_controller', controller)

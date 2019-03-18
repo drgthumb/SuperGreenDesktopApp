@@ -21,7 +21,7 @@ export default {
   layout: 'fullscreen',
   methods: {
     onNext(e) {
-      this.$store.commit('localstorage/first_start')
+      this.$store.commit('app/first_start')
       this.$store.commit('controllers/configure_search_ap_controller', {url: '192.168.4.1', is_sta: false})
     }
   }
