@@ -72,6 +72,7 @@ export const state = () => ({
   search_ap_failed: false,
   search_ap_failed_reason: null,
   search_ap_url: '192.168.4.1',
+  search_n_tries: 0,
   found_ap_controller: null,
   controllers: [],
   selected: '',
@@ -102,12 +103,16 @@ export const mutations = {
   },
   start_search_ap_controller(state) {
     state.searching_ap = true
+    state.search_n_tries = 0
   },
   end_search_ap_controller(state, { controller, error }) {
     state.searching_ap = false
     state.found_ap_controller = controller
     state.search_ap_failed = !!error 
     state.search_ap_failed_reason = error 
+  },
+  search_try(state) {
+    state.search_n_tries++
   },
   add_controller(state, controller) {
     state.controllers.push(controller)
@@ -162,8 +167,9 @@ export const mutations = {
   },
 }
 
-const wait_for_controller = async function (url) {
+const wait_for_controller = async function (url, onTry) {
   for (let i = 0; i < 5; ++i) {
+    onTry()
     try {
       const { data: name } = await axios.get(`http://${url}/s?k=DEVICE_NAME`, {timeout: 5000})
       return name
@@ -179,7 +185,7 @@ export const actions = {
   async search_ap_controller(context) {
     let name, url = context.state.search_ap_url;
     context.commit('start_search_ap_controller')
-    if ((name = await wait_for_controller(url)) == false) {
+    if ((name = await wait_for_controller(url, () => context.commit('search_try'))) == false) {
       context.commit('end_search_ap_controller', {controller: null, error: 'No controller found'})
       return
     }

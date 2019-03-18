@@ -6,6 +6,7 @@
     <section :id='$style.body'>
       <img src="~/assets/img/loading.png">
       <h3>Pease wait...</h3>
+      <small>Probing {{ retries }} / 5</small>
     </section>
   </section>
 </template>
@@ -19,6 +20,11 @@ export default {
   layout: 'fullscreen',
   mounted() {
     this.$store.dispatch('controllers/search_ap_controller')
+  },
+  computed: {
+    retries() {
+      return this.$store.state.controllers.search_n_tries
+    },
   },
   created() {
     this.$store.watch(state => state.controllers.searching_ap, () => {

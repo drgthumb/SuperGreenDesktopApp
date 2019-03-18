@@ -29,6 +29,6 @@ export default {
   overflow-y: auto
 
 #container > div
-  max-width: 800pt
+  max-width: 700pt
 
 </style>
