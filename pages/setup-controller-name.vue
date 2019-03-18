@@ -23,7 +23,7 @@ import NextButton from '../components/nextbutton'
 export default {
   data() {
     return {
-      name: '',
+      name: 'SuperGreenDriver',
     }
   },
   components: { CloseButton, NextButton,  },
@@ -36,6 +36,7 @@ export default {
     async saveName() {
       const controller = this.controller
       await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'device_name', value: this.$data.name}) 
+      await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'mdns_domain', value: this.$data.name.toLowerCase()}) 
       this.$router.push('/setup-controller-wifi-sta')
     }
   },

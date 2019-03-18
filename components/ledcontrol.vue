@@ -2,11 +2,11 @@
   <section :id='$style.container'>
     <b>{{ j + 1 }}</b>
     <div :id='$style.box'>
-      <div :class='`${$style.onoff} ${duty > 75 ? $style.on : (duty > 25 ? $style.mid : $style.off)}`'></div>
+      <div :id='$style.onoff' :class='led.duty.value > 75 ? $style.on : (led.duty.value > 25 ? $style.mid : $style.off)' v-on:click='toggleOnOff'></div>
       <b>{{ led.duty.value }}%</b>
     </div>
     <div :id='$style.slider'>
-      <Slider v-model='duty' />
+      <Slider v-model='dim' />
     </div>
     <Loading v-if='loading' />
   </section>
@@ -22,18 +22,26 @@ export default {
   computed: {
     loading() {
       const { led } = this.$props
-      return led.enabled.loading || led.duty.loading || led.box.loading
+      return led.enabled.loading || led.dim.loading || led.duty.loading || led.box.loading
     },
-    duty: {
+    dim: {
       get() {
-        return this.$props.led.duty.value
+        return this.$props.led.dim.value
       },
       set(value) {
         const { 
           i, box, controller, j, led
         } = this.$props
-        this.$store.dispatch('controllers/set_led_param', {id: controller.broker_clientid.value, i: j, key: 'duty', value: Math.round(value)}) 
+        this.$store.dispatch('controllers/set_led_param', {id: controller.broker_clientid.value, i: j, key: 'dim', value: Math.round(value)}) 
       },
+    },
+  },
+  methods: {
+    toggleOnOff() {
+      const { 
+        controller, j, led
+      } = this.$props
+      this.$store.dispatch('controllers/set_led_param', {id: controller.broker_clientid.value, i: j, key: 'duty', value: led.duty.value == 0 ? 100 : 0}) 
     },
   },
   mounted() {
@@ -42,6 +50,7 @@ export default {
     } = this.$props
     this.$store.dispatch('controllers/load_led_param', {id: controller.broker_clientid.value, i: j, key: 'enabled'})
     this.$store.dispatch('controllers/load_led_param', {id: controller.broker_clientid.value, i: j, key: 'duty'})
+    this.$store.dispatch('controllers/load_led_param', {id: controller.broker_clientid.value, i: j, key: 'dim'})
     this.$store.dispatch('controllers/load_led_param', {id: controller.broker_clientid.value, i: j, key: 'box'})
   },
 }
@@ -76,7 +85,7 @@ export default {
   width: 45pt
   height: 45pt
 
-.onoff
+#onoff
   width: 25pt
   height: 25pt
   align-self: flex-end 
@@ -84,6 +93,7 @@ export default {
   background-repeat: no-repeat
   background-size: contain
   background-position: center
+  cursor: pointer
 
 .on
   background-image: url('~/assets/img/lighton.svg')

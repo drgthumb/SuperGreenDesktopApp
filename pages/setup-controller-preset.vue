@@ -9,7 +9,7 @@
     </div>
 
     <section :id='$style.nav'>
-      <NextButton to='/setup-controller-name' />
+      <NextButton :onClick='writePreset' label='Configure' />
     </section>
   </section>
 </template>
@@ -34,7 +34,21 @@ export default {
   methods: {
     select(i) {
       this.$data.selected = i
-    }
+    },
+    async writePreset() {
+      const preset = this.$store.state.presets.configs[this.$data.selected],
+        id = this.$store.state.controllers.selected
+      const shoot_presets = (keys, type, req) =>
+        Object.keys(keys)
+          .filter((k) => typeof keys[k] == 'string' || typeof keys[k] == 'number')
+          .map((k) => this.$store.dispatch(`controllers/set_${type}_param`, req(k, keys[k])))
+
+      let promises = shoot_presets(preset.keys, 'controller', (k, v) => ({id, key: k, value: v,}))
+      preset.keys.leds.forEach((led, i) => promises.push(...shoot_presets(led, 'led', (k, v) => ({id, key: k, value: v, i}))))
+      preset.keys.boxes.forEach((box, i) => promises.push(...shoot_presets(box, 'box', (k, v) => ({id, key: k, value: v, i}))))
+      await Promise.all(promises)
+      this.$router.push('/setup-controller-name')
+    },
   },
 }
 </script>
