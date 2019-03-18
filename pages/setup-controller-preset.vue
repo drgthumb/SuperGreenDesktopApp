@@ -11,18 +11,21 @@
     <section :id='$style.nav'>
       <NextButton :onClick='writePreset' label='Configure' />
     </section>
+    <Loading v-if='loading' label='Uploading config..' />
   </section>
 </template>
 
 <script>
 import Preset from '../components/preset'
 import NextButton from '../components/nextbutton'
+import Loading from '../components/loading'
 
 export default {
   data: () => ({
     selected: 0,
+    loading: false
   }),
-  components: { Preset, NextButton, },
+  components: { Preset, NextButton, Loading, },
   computed: {
     controller() {
       return this.$store.getters['controllers/getSelected']
@@ -36,6 +39,7 @@ export default {
       this.$data.selected = i
     },
     async writePreset() {
+      this.$data.loading = true
       const preset = this.$store.state.presets.configs[this.$data.selected],
         id = this.$store.state.controllers.selected
       const shoot_presets = (keys, type, req) =>
@@ -58,6 +62,7 @@ export default {
 #container
   display: flex
   flex: 1
+  position: relative
   flex-direction: column
   min-height: 100vh
   background-color: #efefef

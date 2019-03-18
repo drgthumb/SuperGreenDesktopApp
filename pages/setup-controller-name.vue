@@ -13,20 +13,23 @@
     <section :id='$style.nav'>
       <NextButton :onClick='saveName' label='Save name' />
     </section>
+    <Loading v-if='loading' label='Setting name..' />
   </section>
 </template>
 
 <script>
 import CloseButton from '../components/closebutton'
 import NextButton from '../components/nextbutton'
+import Loading from '../components/loading'
 
 export default {
   data() {
     return {
       name: 'SuperGreenDriver',
+      loading: false
     }
   },
-  components: { CloseButton, NextButton,  },
+  components: { CloseButton, NextButton, Loading, },
   computed: {
     controller() {
       return this.$store.getters['controllers/getSelected']
@@ -34,6 +37,7 @@ export default {
   },
   methods: {
     async saveName() {
+      this.$data.loading = true
       const controller = this.controller
       await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'device_name', value: this.$data.name}) 
       await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'mdns_domain', value: this.$data.name.toLowerCase()}) 
@@ -47,6 +51,7 @@ export default {
 
 #container
   display: flex
+  position: relative
   align-items: center
   flex: 1
   flex-direction: column

@@ -1,9 +1,13 @@
 <template>
-    <div :id='$style.loading'><div :id='$style.loadingpic'></div></div>
+  <div :id='$style.loading'>
+    <div :id='$style.loadingpic'></div>
+    {{ label }}
+  </div>
 </template>
 
 <script>
 export default {
+  props: ['label']
 }
 </script>
 
@@ -20,15 +24,14 @@ export default {
 
 #loading
   display: flex
+  flex-direction: column
   align-items: center
   justify-content: center
   position: absolute
-  font-size: 0.5em
   top: 0
   left: 0
   width: 100%
   height: 100%
-  display: flex
   border-radius: 3pt
   background-color: rgba(255, 255, 255, 0.8)
   z-index: 3

@@ -15,21 +15,24 @@
     <section :id='$style.nav'>
       <NextButton  :onClick='saveWifi' label='Connect wifi' />
     </section>
+    <Loading v-if='loading' label='Setting up wifi.. Please reconnect to your home wifi.' />
   </section>
 </template>
 
 <script>
 import CloseButton from '../components/closebutton'
 import NextButton from '../components/nextbutton'
+import Loading from '../components/loading'
 
 export default {
   data() {
     return {
       ssid: '',
       password: '',
+      loading: false
     }
   },
-  components: { CloseButton, NextButton,  },
+  components: { CloseButton, NextButton, Loading, },
   computed: {
     controller() {
       return this.$store.getters['controllers/getSelected']
@@ -37,6 +40,7 @@ export default {
   },
   methods: {
     async saveWifi() {
+      this.$data.loading = true
       const controller = this.controller
       await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'wifi_ssid', value: this.$data.ssid}) 
       try {
@@ -54,6 +58,7 @@ export default {
 
 #container
   display: flex
+  position: relative
   align-items: center
   justify-content: center
   flex: 1
