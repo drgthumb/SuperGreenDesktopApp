@@ -9,7 +9,7 @@
         <Loading v-if='box.enabled.loading' />
       </div>
       <div :id='$style.leds'>
-        <div v-for='(led, j) in controller.leds' v-if='led.box.value == i' :key='j' :class='$style.led'>
+        <div v-for='(led, j) in controller.leds' v-if='led.box.value == i' :key='controller.broker_clientid.value + j' :class='$style.led'>
           <LedControl :i='i' :box='box' :controller='controller' :j='j' :led='led' />
         </div>
       </div>

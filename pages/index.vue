@@ -1,7 +1,7 @@
 <template>
   <section v-if='controller' :id='$style.container'>
     <div v-for='(box, i) in controller.boxes'>
-      <Box :i='i' :controller='controller' :box='box' :key='i' />
+      <Box :i='i' :controller='controller' :box='box' :key='controller.broker_clientid.value + i' />
     </div>
   </section>
 </template>
