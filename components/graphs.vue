@@ -18,6 +18,8 @@
 <script>
 export default {
   props: {
+    min: Number,
+    max: Number,
     title: String,
     color: String,
     value: String,
@@ -29,10 +31,8 @@ export default {
       if (!this.$refs.graph) return ''
       const width = this.$refs.graph.clientWidth,
             height = this.$refs.graph.clientHeight,
-            metrics = this.$props.metrics,
+            { min, max, metrics } = this.$props,
             xspan = width / (metrics.length - 1),
-            min = Math.min(...metrics),
-            max = Math.max(...metrics),
             ymin = min - (max - min) * 0.2,
             ymax = max + (max - min) * 0.2
       let points = `0,${height} `,
@@ -50,10 +50,8 @@ export default {
       if (!this.$refs.graph) return ''
       const width = this.$refs.graph.clientWidth,
             height = this.$refs.graph.clientHeight,
-            metrics = this.$props.metrics,
+            { min, max, metrics } = this.$props,
             xspan = width / (metrics.length - 1),
-            min = Math.min(...metrics),
-            max = Math.max(...metrics),
             ymin = min - (max - min) * 0.2,
             ymax = max + (max - min) * 0.2
       let points = '',

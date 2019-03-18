@@ -36,6 +36,7 @@ export const mutations = {
 export const actions = {
   async load_graph(context, { id, url}) {
     context.commit('init', { id, url })
+    await new Promise((r) => setTimeout(r, 500))
     const { data: metrics } = await axios.get(url)
     context.commit('set_metrics', {id, metrics: metrics})
   },

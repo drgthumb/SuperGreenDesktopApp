@@ -2,8 +2,8 @@
   <section :id='$style.container'>
     <b>Monitoring</b>
     <div :id='$style.graphs'>
-      <Graphs title='Temperature' color='#3bb30b' :value='0+"°"' :metrics='temperature' :loading='loading' />
-      <Graphs title='Humidity' color='#0b81b3' :value='0+"%"' :metrics='humidity' :loading='loading' />
+      <Graphs title='Temperature' color='#3bb30b' :value='(temperature ? temperature[temperature.length-1] : "-")+"°"' :metrics='temperature' :loading='loading' :min=10 :max=40 />
+      <Graphs title='Humidity' color='#0b81b3' :value='(humidity ? humidity[humidity.length-1] : "-")+"%"' :metrics='humidity' :loading='loading' :min=0 :max=100 />
     </div>
   </section>
 </template>
@@ -15,14 +15,15 @@ export default {
   components: { Graphs },
   props: [ 'i', 'box', 'controller' ],
   created() {
-    const { i, box, controller } = this.$props,
-          graph_id = `temphumi.${controller.broker_clientid.value}`
+    const { i, controller } = this.$props,
+      graph_id = `temphumi.${controller.broker_clientid.value}.${i}`
+    console.log(`http://metrics.supergreenlab.com?box=${i}&controller=${controller.broker_clientid.value}`)
     this.$store.dispatch('graphs/load_graph', {id: graph_id, url: `http://metrics.supergreenlab.com?box=${i}&controller=${controller.broker_clientid.value}`})
   },
   computed: {
     loading() {
-      const controller = this.$props.controller,
-            graph_id = `temphumi.${controller.broker_clientid.value}`,
+      const {i, controller} = this.$props,
+            graph_id = `temphumi.${controller.broker_clientid.value}.${i}`,
             source = this.$store.getters['graphs/source'](graph_id)
       if (!source) {
         return true
@@ -30,8 +31,8 @@ export default {
       return !source.loaded
     },
     temperature() {
-      const controller = this.$props.controller,
-            graph_id = `temphumi.${controller.broker_clientid.value}`,
+      const {i, controller} = this.$props,
+            graph_id = `temphumi.${controller.broker_clientid.value}.${i}`,
             source = this.$store.getters['graphs/source'](graph_id)
       if (!source || !source.metrics.temp) {
         return []
@@ -39,8 +40,8 @@ export default {
       return source.metrics.temp.map((t) => t[1])
     },
     humidity() {
-      const controller = this.$props.controller,
-            graph_id = `temphumi.${controller.broker_clientid.value}`,
+      const {i, controller} = this.$props,
+            graph_id = `temphumi.${controller.broker_clientid.value}.${i}`,
             source = this.$store.getters['graphs/source'](graph_id)
       if (!source || !source.metrics.humi) {
         return []
