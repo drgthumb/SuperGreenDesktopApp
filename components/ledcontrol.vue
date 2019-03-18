@@ -2,22 +2,28 @@
   <section :id='$style.container'>
     <b>{{ j + 1 }}</b>
     <div :id='$style.box'>
-      <div :class='`${$style.onoff} ${duty.value > 5 ? $style.on : $style.off}`'></div>
+      <div :class='`${$style.onoff} ${duty > 75 ? $style.on : (duty > 25 ? $style.mid : $style.off)}`'></div>
       <b>{{ led.duty.value }}%</b>
     </div>
     <div :id='$style.slider'>
       <Slider v-model='duty' />
     </div>
+    <Loading v-if='loading' />
   </section>
 </template>
 
 <script>
 import Slider from '../components/slider'
+import Loading from '../components/loading'
 
 export default {
-  components: { Slider },
+  components: { Slider, Loading, },
   props: [ 'i', 'box', 'controller', 'j', 'led' ],
   computed: {
+    loading() {
+      const { led } = this.$props
+      return led.enabled.loading || led.duty.loading || led.box.loading
+    },
     duty: {
       get() {
         return this.$props.led.duty.value
@@ -45,19 +51,25 @@ export default {
 
 #container
   display: flex
+  position: relative
   flex-direction: column
   align-items: center
   justify-content: center
-  margin: 10pt
+  margin: 4pt
 
 #container > b
   align-self: flex-start
+  margin-left: 2pt
+  margin-bottom: -6pt
+  z-index: 2
+  text-shadow: -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff
 
 #box
   display: flex
   flex-direction: column
   background-color: white
   border: 1px solid #ebebeb
+  border-radius: 3pt
   color: #8b8b8b
   align-items: center
   justify-content: center
@@ -72,16 +84,17 @@ export default {
   background-repeat: no-repeat
   background-size: contain
   background-position: center
-  cursor: pointer
 
 .on
   background-image: url('~/assets/img/lighton.svg')
+
+.mid
+  background-image: url('~/assets/img/lightmid.svg')
 
 .off
   background-image: url('~/assets/img/lightoff.svg')
 
 #slider
   width: 100%
-  height: 15pt
 
 </style>

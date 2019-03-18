@@ -6,6 +6,7 @@
         Off
         <div :class='`${$style.onoff} ${(box.enabled.value ? $style.on : $style.off)}`' v-on:click='switchOff()'></div>
         On
+        <Loading v-if='box.enabled.loading' />
       </div>
       <div :id='$style.leds'>
         <div v-for='(led, j) in controller.leds' v-if='led.box.value == i' :key='j' :class='$style.led'>
@@ -16,6 +17,7 @@
         <img src='~/assets/img/vent-small.svg' />
         <div :id='$style.sliderw'><Slider v-model='blower' /></div>
         <img src='~/assets/img/vent-big.svg' />
+        <Loading v-if='box.blower.loading' />
       </div>
     </div>
   </section>
@@ -24,9 +26,10 @@
 <script>
 import LedControl from '../components/ledcontrol'
 import Slider from '../components/slider'
+import Loading from '../components/loading'
 
 export default {
-  components: { LedControl, Slider, },
+  components: { LedControl, Slider, Loading, },
   props: [ 'i', 'box', 'controller', ],
   computed: {
     blower: {
@@ -66,6 +69,7 @@ export default {
   display: flex
   flex-direction: column
   border-radius: 2pt
+  z-index: 10
 
 #control
   background-color: #fcfcfc
@@ -73,6 +77,7 @@ export default {
   margin: 10pt
 
 #boxonoff
+  position: relative
   display: flex
   align-items: center
   justify-content: center
@@ -108,6 +113,7 @@ export default {
 
 #blower
   display: flex
+  position: relative
   padding: 5pt 30pt
   align-items: center
   justify-content: center

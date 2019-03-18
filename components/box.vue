@@ -13,6 +13,7 @@
     </div>
     <div v-if='!box.enabled.value' :id='$style.disabled_overlay'>
       <button v-on:click='enable()'>Enable</button>
+      <Loading v-if='box.enabled.loading' />
     </div>
   </section>
 </template>
@@ -21,9 +22,10 @@
 import BoxControl from '../components/boxcontrol'
 import BoxMonitoring from '../components/boxmonitoring'
 import BoxLiveview from '../components/boxliveview'
+import Loading from '../components/loading'
 
 export default {
-  components: { BoxControl, BoxMonitoring, BoxLiveview, },
+  components: { BoxControl, BoxMonitoring, BoxLiveview, Loading, },
   props: [ 'i', 'box', 'controller' ],
   methods: {
     enable() {

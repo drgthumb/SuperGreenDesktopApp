@@ -2,7 +2,7 @@
   <section :id='$style.container' :class='(selected ? $style.selected : "")'>
     <h2>{{ title }}</h2>
     <div :id='$style.iconw'>
-      <img :src='`presets/${icon}`' />
+      <img :src='require(`~/assets/img/presets/${icon}`)' />
     </div>
     <p>{{ description }}</p>
   </section>
