@@ -21,7 +21,7 @@ export default {
     title: String,
     color: String,
     value: String,
-    values: Array,
+    metrics: Array,
     loading: Boolean,
   },
   computed: {
@@ -29,16 +29,16 @@ export default {
       if (!this.$refs.graph) return ''
       const width = this.$refs.graph.clientWidth,
             height = this.$refs.graph.clientHeight,
-            values = this.$props.values,
-            xspan = width / (values.length - 1),
-            min = Math.min(...values),
-            max = Math.max(...values),
+            metrics = this.$props.metrics,
+            xspan = width / (metrics.length - 1),
+            min = Math.min(...metrics),
+            max = Math.max(...metrics),
             ymin = min - (max - min) * 0.2,
             ymax = max + (max - min) * 0.2
       let points = `0,${height} `,
           x = 0
-      for (let i in values) {
-        const value = (values[i] - ymin) / (ymax - ymin)
+      for (let i in metrics) {
+        const value = (metrics[i] - ymin) / (ymax - ymin)
         points += `${x},${value * height} `
         x += xspan
       }
@@ -50,21 +50,21 @@ export default {
       if (!this.$refs.graph) return ''
       const width = this.$refs.graph.clientWidth,
             height = this.$refs.graph.clientHeight,
-            values = this.$props.values,
-            xspan = width / (values.length - 1),
-            min = Math.min(...values),
-            max = Math.max(...values),
+            metrics = this.$props.metrics,
+            xspan = width / (metrics.length - 1),
+            min = Math.min(...metrics),
+            max = Math.max(...metrics),
             ymin = min - (max - min) * 0.2,
             ymax = max + (max - min) * 0.2
       let points = '',
           x = 0
-      for (let i in values) {
+      for (let i in metrics) {
         if (i == 0) {
           points += 'M'
         } else {
           points += 'L'
         }
-        const value = (values[i] - ymin) / (ymax - ymin)
+        const value = (metrics[i] - ymin) / (ymax - ymin)
         points += `${x} ${value * height} `
         x += xspan
       }
