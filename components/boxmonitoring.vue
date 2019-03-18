@@ -2,8 +2,8 @@
   <section :id='$style.container'>
     <b>Monitoring</b>
     <div :id='$style.graphs'>
-      <Graphs title='Temperature' color='#3bb30b' :value='(temperature ? temperature[temperature.length-1] : "-")+"°"' :metrics='temperature' :loading='loading' :min=10 :max=40 />
-      <Graphs title='Humidity' color='#0b81b3' :value='(humidity ? humidity[humidity.length-1] : "-")+"%"' :metrics='humidity' :loading='loading' :min=0 :max=100 />
+      <Graphs title='Temperature' color='#3bb30b' :value='last_temperature' :metrics='temperature' :loading='loading' :min=10 :max=40 />
+      <Graphs title='Humidity' color='#0b81b3' :value='last_humidity' :metrics='humidity' :loading='loading' :min=0 :max=100 />
     </div>
   </section>
 </template>
@@ -39,6 +39,14 @@ export default {
       }
       return source.metrics.temp.map((t) => t[1])
     },
+    last_temperature() {
+      const temperature = this.temperature
+      if (temperature && temperature.length) {
+        const v = temperature[temperature.length-1]
+        return (v < -100 || v > 100) ? 'error' : `${v}°`
+      }
+      return "-"
+    },
     humidity() {
       const {i, controller} = this.$props,
             graph_id = `temphumi.${controller.broker_clientid.value}.${i}`,
@@ -47,6 +55,14 @@ export default {
         return []
       }
       return source.metrics.humi.map((h) => h[1])
+    },
+    last_humidity() {
+      const humidity = this.humidity
+      if (humidity && humidity.length) {
+        const v = humidity[humidity.length-1]
+        return (v < 0 || v > 100) ? 'error' : `${v}%`
+      }
+      return "-"
     },
   }
 }
