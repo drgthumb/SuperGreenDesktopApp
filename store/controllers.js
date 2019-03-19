@@ -170,6 +170,7 @@ export const mutations = {
     setById(state, id, controller)
   },
   loaded_led_param(state, { id, i, key, value, error }) {
+    console.log(id, i, key, value, error)
     let controller = getById(state, id)
     controller.leds[i][key] = Object.assign({}, controller.leds[i][key], {error, value, loaded: true, loading: false})
     setById(state, id, controller)
@@ -253,7 +254,7 @@ export const actions = {
       const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}`, {timeout: 5000}))
       context.commit('loaded_box_param', {id, i, key, value: config.integer ? parseInt(value) : value})
     } catch(e) {
-      context.commit('loaded_box_param', {id, key, error: e})
+      context.commit('loaded_box_param', {id, i, key, error: e})
     }
   },
   async load_led_param(context, { id, i, key }) {
@@ -264,7 +265,7 @@ export const actions = {
       const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}`, {timeout: 5000}))
       context.commit('loaded_led_param', {id, i, key, value: config.integer ? parseInt(value) : value})
     } catch(e) {
-      context.commit('loaded_led_param', {id, key, error: e})
+      context.commit('loaded_led_param', {id, i, key, error: e})
     }
   },
   async load_i2c_param(context, { id, i, key }) {
@@ -275,7 +276,7 @@ export const actions = {
       const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}`, {timeout: 5000}))
       context.commit('loaded_i2c_param', {id, i, key, value: config.integer ? parseInt(value) : value})
     } catch(e) {
-      context.commit('loaded_i2c_param', {id, key, error: e})
+      context.commit('loaded_i2c_param', {id, i, key, error: e})
     }
   },
   async set_controller_param(context, { id, key, value }) {
@@ -297,7 +298,7 @@ export const actions = {
       await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
       await context.dispatch('load_box_param', {id, i, key})
     } catch(e) {
-      context.commit('loaded_box_param', {id, key, error: e})
+      context.commit('loaded_box_param', {id, i, key, error: e})
     }
   },
   async set_led_param(context, { id, i, key, value }) {
@@ -308,7 +309,7 @@ export const actions = {
       await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
       await context.dispatch('load_led_param', {id, i, key})
     } catch(e) {
-      context.commit('loaded_led_param', {id, key, error: e})
+      context.commit('loaded_led_param', {id, i, key, error: e})
     }
   },
   async set_i2c_param(context, { id, i, key }) {
@@ -319,7 +320,7 @@ export const actions = {
       await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
       await context.dispatch('load_i2c_param', {id, i, key})
     } catch(e) {
-      context.commit('loaded_i2c_param', {id, key, error: e})
+      context.commit('loaded_i2c_param', {id, i, key, error: e})
     }
   },
 }

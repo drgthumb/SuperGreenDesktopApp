@@ -1,17 +1,12 @@
-# supergreendesktop
+# SuperGreenDesktop
 
-> SuperGreenDesktop
+SuperGreenDriver's official control app.
+Allows to setup and 
 
-## Build Setup
+# User manual
 
-``` bash
-# install dependencies
-$ npm install # Or yarn install
+Download the app or go to https://app.supergreenlab.com
 
-# development with vue devtools
-$ npm run dev
+## Welcome screen
 
-# build for production
-$ npm run build
-
-For detailed explanation on how things work, checkout [Nuxt.js](https://github.com/nuxt/nuxt.js), [Electron.js](https://electronjs.org/), and [electron-builder](https://www.electron.build/).
+# Designs

@@ -9,11 +9,18 @@
     "appId": "com.supergreenlab.desktopapp",
     "directories": {
       "buildResources": "static"
+    },
+    "mac": {
+      "category": "com.supergreenlab.desktopapp"
+    },
+    "linux": {
+      "category": "Utility"
     }
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=DEV electron .",
-    "build": "nuxt build && electron-builder"
+    "build": "nuxt build && electron-builder",
+    "build-all": "nuxt build && electron-builder -mwl"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.4.1",
@@ -26,7 +33,6 @@
     "cross-env": "^5.1.4",
     "electron": "2.0.0-beta.7",
     "electron-builder": "^20.8.1",
-    "electron-devtools-installer": "^2.2.3",
-    "electron-packager": "^13.1.1"
+    "electron-devtools-installer": "^2.2.3"
   }
 }
