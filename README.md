@@ -1,7 +1,7 @@
 # SuperGreenDesktop
 
 SuperGreenDriver's official control app.
-Allows to setup and 
+Allows to setup and control one or multiple [SuperGreenController]().
 
 # User manual
 
