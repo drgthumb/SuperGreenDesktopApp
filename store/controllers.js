@@ -222,10 +222,10 @@ export const actions = {
         state: Object.assign({}, controller.state, {
           value: state, loaded: true
         }),
-        wifi_ip: Object.assign({}, controller.state, {
+        wifi_ip: Object.assign({}, controller.wifi_ip, {
           value: wifi_ip, loaded: true
         }),
-        mdns_domain: Object.assign({}, controller.state, {
+        mdns_domain: Object.assign({}, controller.mdns_domain, {
           value: mdns_domain, loaded: true
         }),
       })
@@ -284,6 +284,7 @@ export const actions = {
           config = controller[key].config_key
     context.commit('loading_controller_param', {id, key})
     try {
+      console.log(key, config)
       await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
       await context.dispatch('load_controller_param', {id, key})
     } catch(e) {

@@ -44,6 +44,7 @@ export default {
       const controller = this.controller
       await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'wifi_ssid', value: this.$data.ssid}) 
       try {
+        await new Promise((r) => setTimeout(r, 1000))
         await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'wifi_password', value: this.$data.password}) 
       } catch (e) {
         console.log(e)
