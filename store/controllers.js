@@ -24,7 +24,7 @@ const controller_defaults = {
   discovery_url: '',
   loaded: false,
   found: false,
-  found_try: 0,
+  found_try: 1,
   i2c: [],
   leds: [],
   boxes: [],
@@ -72,7 +72,12 @@ const schedule_promise = (n, retries) => {
 }
 
 const controller_chains = {}
-const controller_chain = (id) => controller_chains[id] = controller_chains[id] || schedule_promise(3, 3)
+const controller_chain = (id) => {
+  if (typeof controller_chains[id] == 'undefined') {
+    controller_chains[id] = schedule_promise(3, 3)
+  }
+  return controller_chains[id]
+}
 const discovery_chain = schedule_promise(3, 3)
 
 for (let i in version_config.keys) {
@@ -98,7 +103,7 @@ for (let i in version_config.keys) {
 }
 
 const stored = async function() {
-  const controllers = (await storage.get('controllers', [])).map((c) => Object.assign(c, {found: false}))
+  const controllers = (await storage.get('controllers', [])).map((c) => Object.assign(c, {found: false, found_try: 1}))
   return {
     selected: await storage.get('selected', ''),
     controllers,
@@ -284,8 +289,8 @@ export const actions = {
   async search_controller(context, { id }) {
     const controller = getById(context.state, id),
           url = controller.mdns_domain.value,
-          { data: wifi_ip } = await controller_chain(async () => axios.get(`http://${url}.local/s?k=WIFI_IP`, {timeout: 5000}), (e, n) => context.commit('found_try', {id, n}))
-    context.commit('loaded_controller_param', {id, key: 'WIFI_IP', value: wifi_ip})
+          { data: wifi_ip } = await controller_chain(id)(async () => axios.get(`http://${url}.local/s?k=WIFI_IP`, {timeout: 5000}), (e, n) => context.commit('set_found_try', {id, n}))
+    context.commit('loaded_controller_param', {id, key: 'wifi_ip', value: wifi_ip})
     context.commit('set_found', id)
   },
   async load_controller_param(context, { id, key }) {

@@ -19,7 +19,7 @@
 <template>
   <section v-if='controller' :id='$style.container'>
     <div v-if='!controller.found' :id='$style.loading'>
-      <Loading :label='`Searching controller.. ${controller.found_try.value}/3`' />
+      <Loading :label='`Searching controller.. ${controller.found_try}/3`' />
       <a v-if='failed' href='javascript:void(0)' v-on:click='retry'>Retry now</a>
     </div>
     <div v-else v-for='(box, i) in controller.boxes'>
