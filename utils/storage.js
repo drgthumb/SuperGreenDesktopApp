@@ -16,9 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default async function({store, route, redirect}) {
-  await store.dispatch('app/init')
-  if (route.path != '/welcome' && store.state.app.first_start) {
-    redirect('/welcome')
-  }
+import storage from 'electron-json-storage'
+
+/*storage.clear(function(error) {
+  if (error) throw error;
+});*/
+
+export default {
+  async get(key, def) {
+    return new Promise((resolve, reject) => storage.get(key, (error, data) => {
+      if (error) {
+        console.log(error)
+        reject(error)
+        return
+      }
+      resolve(typeof data == 'undefined' || typeof data.v == 'undefined' ? def : data.v)
+    }))
+  },
+  async set(key, value) {
+    return new Promise((resolve, reject) => storage.set(key, {v: value}, (error) => {
+      if (error) {
+        console.log(error)
+        reject(error)
+        return
+      }
+      resolve()
+    }))
+  },
 }

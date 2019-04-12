@@ -18,6 +18,7 @@
 
 import axios from 'axios'
 import version_config from '../version_config.json'
+import storage from '../utils/storage'
 
 const controller_defaults = {
   discovery_url: '',
@@ -38,18 +39,25 @@ const new_loadable_key = function(key) {
   }
 }
 
-const schedule_promise = (n) => {
+const schedule_promise = (n, retries) => {
   let loading_param_promise = Promise.resolve(),
       promises = []
-  return function(req_func) {
+  return function(req_func, ret_func) {
     let resolve, reject
     const p = new Promise((res, rej) => {resolve = res; reject = rej})
     loading_param_promise.then(async () => {
-      try {
-        resolve(await req_func())
-      } catch(e) {
-        reject(e)
+      let error
+      for (let i = 0; i < retries; ++i) {
+        try {
+          resolve(await req_func())
+          return
+        } catch(e) {
+          console.log(e)
+          error = e
+          ret_func && ret_func(e)
+        }
       }
+      reject(error)
     })
     promises.push(p)
     if (promises.length >= n) {
@@ -61,7 +69,9 @@ const schedule_promise = (n) => {
   }
 }
 
-const controller_chain = schedule_promise(3)
+const controller_chains = {}
+const controller_chain = (id) => controller_chains[id] = controller_chains[id] || schedule_promise(3, 3)
+const discovery_chain = schedule_promise(3, 3)
 
 for (let i in version_config.keys) {
   const key = version_config.keys[i]
@@ -85,9 +95,11 @@ for (let i in version_config.keys) {
   }
 }
 
-const storage = {
-  selected: window.localStorage.getItem('selected') || '',
-  controllers: JSON.parse(window.localStorage.getItem('controllers') || '[]'),
+const stored = async function() {
+  return {
+    selected: await storage.get('selected', ''),
+    controllers: await storage.get('controllers', []),
+  }
 }
 
 export const state = () => ({
@@ -98,13 +110,13 @@ export const state = () => ({
   search_ap_url: '192.168.4.1',
   search_n_tries: 0,
   found_ap_controller: null,
-  controllers: storage.controllers,
-  selected: storage.selected,
+  controllers: [],
+  selected: '',
 })
 
 const storeState = (state) => {
-  window.localStorage.setItem('selected', state.selected)
-  window.localStorage.setItem('controllers', JSON.stringify(state.controllers))
+  storage.set('selected', state.selected)
+  storage.set('controllers', state.controllers)
 }
 
 const getById = function(state, id) {
@@ -127,6 +139,10 @@ export const getters = {
 }
 
 export const mutations = {
+  init(state, { selected, controllers }) {
+    state.selected = selected
+    state.controllers = controllers
+  },
   configure_search_ap_controller(state, { url, is_sta }) {
     state.search_ap_url = url
     state.search_ap_is_sta = is_sta
@@ -188,7 +204,6 @@ export const mutations = {
     setById(state, id, controller)
   },
   loaded_led_param(state, { id, i, key, value, error }) {
-    console.log(id, i, key, value, error)
     let controller = getById(state, id)
     controller.leds[i][key] = Object.assign({}, controller.leds[i][key], {error, value, loaded: true, loading: false})
     setById(state, id, controller)
@@ -213,8 +228,14 @@ const wait_for_controller = async function (url, onTry) {
   return false
 }
 
+let init_done = false
 export const actions = {
-  // find controller at 192.168.4.1 and load device_name + broker_clientid
+  async init(context) {
+    if (init_done == false) {
+      context.commit('init', await stored())
+      init_done = true
+    }
+  },
   async search_ap_controller(context) {
     let name, url = context.state.search_ap_url;
     context.commit('start_search_ap_controller')
@@ -228,10 +249,10 @@ export const actions = {
     })
     context.commit('end_search_ap_controller', {controller, error: null})
     setTimeout(async () => {
-      const { data: broker_clientid } = await controller_chain(async () => axios.get(`http://${url}/s?k=BROKER_CLIENTID`, {timeout: 5000})),
-            { data: state } = await controller_chain(async () => axios.get(`http://${url}/i?k=STATE`, {timeout: 5000})),
-            { data: wifi_ip } = await controller_chain(async () => axios.get(`http://${url}/s?k=WIFI_IP`, {timeout: 5000})),
-            { data: mdns_domain } = await controller_chain(async () => axios.get(`http://${url}/s?k=MDNS_DOMAIN`, {timeout: 5000}))
+      const { data: broker_clientid } = await discovery_chain(async () => axios.get(`http://${url}/s?k=BROKER_CLIENTID`, {timeout: 5000})),
+            { data: state } = await discovery_chain(async () => axios.get(`http://${url}/i?k=STATE`, {timeout: 5000})),
+            { data: wifi_ip } = await discovery_chain(async () => axios.get(`http://${url}/s?k=WIFI_IP`, {timeout: 5000})),
+            { data: mdns_domain } = await discovery_chain(async () => axios.get(`http://${url}/s?k=MDNS_DOMAIN`, {timeout: 5000}))
       controller = Object.assign({}, controller, {
         loaded: true,
         broker_clientid: Object.assign({}, controller.broker_clientid, {
@@ -258,7 +279,7 @@ export const actions = {
           config = controller[key].config_key
     context.commit('loading_controller_param', {id, key})
     try {
-      const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}`, {timeout: 5000}))
+      const { data: value } = await controller_chain(id)(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}`, {timeout: 5000}))
       context.commit('loaded_controller_param', {id, key, value: config.integer ? parseInt(value) : value})
     } catch(e) {
       context.commit('loaded_controller_param', {id, key, error: e})
@@ -269,7 +290,7 @@ export const actions = {
           config = controller.boxes[i][key].config_key
     context.commit('loading_box_param', {id, i, key})
     try {
-      const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}`, {timeout: 5000}))
+      const { data: value } = await controller_chain(id)(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}`, {timeout: 5000}))
       context.commit('loaded_box_param', {id, i, key, value: config.integer ? parseInt(value) : value})
     } catch(e) {
       context.commit('loaded_box_param', {id, i, key, error: e})
@@ -280,7 +301,7 @@ export const actions = {
           config = controller.leds[i][key].config_key
     context.commit('loading_led_param', {id, i, key})
     try {
-      const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}`, {timeout: 5000}))
+      const { data: value } = await controller_chain(id)(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}`, {timeout: 5000}))
       context.commit('loaded_led_param', {id, i, key, value: config.integer ? parseInt(value) : value})
     } catch(e) {
       context.commit('loaded_led_param', {id, i, key, error: e})
@@ -291,7 +312,7 @@ export const actions = {
       config = controller.i2c[i][key].config_key
     context.commit('loading_i2c_param', id, i, key)
     try {
-      const { data: value } = await controller_chain(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}`, {timeout: 5000}))
+      const { data: value } = await controller_chain(id)(async () => axios.get(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}`, {timeout: 5000}))
       context.commit('loaded_i2c_param', {id, i, key, value: config.integer ? parseInt(value) : value})
     } catch(e) {
       context.commit('loaded_i2c_param', {id, i, key, error: e})
@@ -302,8 +323,7 @@ export const actions = {
           config = controller[key].config_key
     context.commit('loading_controller_param', {id, key})
     try {
-      console.log(key, config)
-      await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
+      await controller_chain(id)(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
       await context.dispatch('load_controller_param', {id, key})
     } catch(e) {
       context.commit('loaded_controller_param', {id, key, error: e})
@@ -314,7 +334,7 @@ export const actions = {
           config = controller.boxes[i][key].config_key
     context.commit('loading_box_param', {id, i, key})
     try {
-      await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
+      await controller_chain(id)(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=BOX_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
       await context.dispatch('load_box_param', {id, i, key})
     } catch(e) {
       context.commit('loaded_box_param', {id, i, key, error: e})
@@ -325,7 +345,7 @@ export const actions = {
           config = controller.leds[i][key].config_key
     context.commit('loading_led_param', {id, i, key})
     try {
-      await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
+      await controller_chain(id)(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=LED_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
       await context.dispatch('load_led_param', {id, i, key})
     } catch(e) {
       context.commit('loaded_led_param', {id, i, key, error: e})
@@ -336,7 +356,7 @@ export const actions = {
         config = controller.i2c[i][key].config_key
     context.commit('loading_i2c_param', id, i, key)
     try {
-      await controller_chain(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
+      await controller_chain(id)(async () => await axios.post(`http://${controller.discovery_url}/${config.integer ? 'i' : 's'}?k=I2C_${i}_${key.toUpperCase()}&v=${value}`, {timeout: 5000}))
       await context.dispatch('load_i2c_param', {id, i, key})
     } catch(e) {
       context.commit('loaded_i2c_param', {id, i, key, error: e})

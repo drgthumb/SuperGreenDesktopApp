@@ -22,18 +22,15 @@
       <CloseButton />
     </section>
     <h1>New box detected.</h1>
-    <h3>Connect it</h3>
+    <h3>Connect your computer back to the wifi network</h3>
+    <small>Check that the <div :id='$style.ssid'></div> is not back, it means wifi configuration failed. If it is back on, please connect to it, and <a href='javascript:void(0)' v-on:click='goBack'>go back to previous step</a></small>
+    <Loading v-if='loading' />
+    <a v-else href='javascript:void()' v-on:click='waitOnline'>Oups, did you try turning it off and back on again ? then click here to retry.</a>
     <section :id='$style.body'>
-      <img src='~/assets/img/wifi-robot-icon.png' />
-      <h2>Wifi configuration:</h2>
-      <small>Has to be connected at least once for a fresh upgrade !</small>
-      <input type='text' v-model='ssid' placeholder='Enter SSID' />
-      <input type='text' v-model='password' placeholder='Enter wpa-passkey' />
     </section>
     <section :id='$style.nav'>
       <NextButton  :onClick='saveWifi' label='Connect wifi' />
     </section>
-    <Loading v-if='loading' label='Setting up wifi..' />
   </section>
 </template>
 
@@ -45,9 +42,8 @@ import Loading from '../components/loading'
 export default {
   data() {
     return {
-      ssid: '',
-      password: '',
-      loading: false
+      loading: false,
+      failed: true,
     }
   },
   components: { CloseButton, NextButton, Loading, },
@@ -57,17 +53,19 @@ export default {
     },
   },
   methods: {
-    async saveWifi() {
+    async waitOnline() {
+      this.$data.failed = false
       this.$data.loading = true
-      const controller = this.controller
-      await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'wifi_ssid', value: this.$data.ssid}) 
       try {
-        await new Promise((r) => setTimeout(r, 1000))
-        await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'wifi_password', value: this.$data.password}) 
-      } catch (e) {
+        await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'wifi_ssid', value: this.$data.ssid}) 
+      } catch(e) {
         console.log(e)
+        this.$data.failed = true
       }
-      this.$router.push('/setup-controller-wait-online')
+      this.$data.loading = false
+    },
+    goBack() {
+      this.$router.back()
     },
   },
 }

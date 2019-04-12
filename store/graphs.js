@@ -17,21 +17,28 @@
  */
 
 import axios from 'axios'
+import storage from '../utils/storage'
 
-const storage = {
-  sources: JSON.parse(window.localStorage.getItem('graphs') || '{}'),
+const stored = async function() {
+  return {
+    sources: await storage.get('graphs', {}),
+  }
 }
 
 export const state = () => ({
-  sources: storage.sources, // will move to flatten state later if needed performance wise
+  sources: {}, // will move to flatten state later if needed performance wise
 })
 
 const storeState = (state) => {
-  window.localStorage.setItem('graphs', JSON.stringify(state.sources))
+  storage.set('graphs', state.sources)
 }
 
 export const mutations = {
-  init(state, { id, url }) {
+  init(state, { sources }) {
+    console.log('graphs init')
+    state.sources = sources
+  },
+  add_source(state, { id, url }) {
     state.sources = Object.assign({}, state.sources, {
       [id]: Object.assign({metrics: []}, state.sources[id] || {}, {
         url,
@@ -51,9 +58,16 @@ export const mutations = {
   },
 }
 
+let init_done = false
 export const actions = {
+  async init(context) {
+    if (init_done == false) {
+      context.commit('init', await stored())
+      init_done = true
+    }
+  },
   async load_graph(context, { id, url}) {
-    context.commit('init', { id, url })
+    context.commit('add_source', { id, url })
     await new Promise((r) => setTimeout(r, 500))
     const { data: metrics } = await axios.get(url)
     context.commit('set_metrics', {id, metrics: metrics})

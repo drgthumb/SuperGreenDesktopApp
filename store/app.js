@@ -16,20 +16,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const defaultState = {
-  first_start: true,
-}
-const storage = JSON.parse(window.localStorage.getItem('app') || JSON.stringify(defaultState))
+import storage from '../utils/storage'
 
-export const state = () => Object.assign({}, storage)
+const stored = async function () {
+  return {
+    first_start: await storage.get('first_start', true)
+  }
+}
+
+export const state = () => ({
+  first_start: true
+})
 
 const storeState = (state) => {
-  return window.localStorage.setItem('app', JSON.stringify(state))
+  storage.set('first_start', state.first_start)
 }
 
 export const mutations = {
+  init(state, { first_start }) {
+    state.first_start = first_start
+  },
   first_start(state) {
     state.first_start = false
     storeState(state)
+  },
+}
+
+let init_done = false
+export const actions = {
+  async init(context) {
+    if (init_done == false) {
+      context.commit('init', await stored())
+      init_done = true
+    }
   },
 }

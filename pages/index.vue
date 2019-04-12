@@ -26,13 +26,19 @@
 
 <script>
 import Box from '../components/box'
+import Loading from '../components/loading'
 
 export default {
-  components: { Box },
+  components: { Box, Loading, },
   computed: {
     controller() {
       return this.$store.getters['controllers/getSelected']
     },
+  },
+  async fetch({ store }) {
+    await store.dispatch('controllers/init')
+    await store.dispatch('liveviews/init')
+    await store.dispatch('graphs/init')
   },
 }
 </script>

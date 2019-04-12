@@ -16,19 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const storage = {
-  sources: JSON.parse(window.localStorage.getItem('liveviews') || '{}'),
+import storage from '../utils/storage'
+
+const stored = async function() {
+  return {
+    sources: await storage.get('liveviews', {}),
+  }
 }
 
 export const state = () => ({
-  sources: storage.sources, // will move to flatten state later if needed performance wise
+  sources: {}, // will move to flatten state later if needed performance wise
 })
 
 const storeState = (state) => {
-  window.localStorage.setItem('liveviews', JSON.stringify(state.sources))
+  storage.set('liveviews', state.sources)
 }
 
 export const mutations = {
+  init(state, { sources }) {
+    state.sources = sources
+  },
   add_source(state, { id, url }) {
     state.sources = Object.assign({}, state.sources, {
       [id]: {
@@ -49,5 +56,15 @@ export const getters = {
   sources: (state) => (prefix) => {
     const keys = Object.keys(state.sources).filter((k) => k.indexOf(prefix) == 0) 
     return keys.map((k) => state.sources[k])
+  },
+}
+
+let init_done = false
+export const actions = {
+  async init(context) {
+    if (init_done == false) {
+      context.commit('init', await stored())
+      init_done = true
+    }
   },
 }
