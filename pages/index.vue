@@ -20,7 +20,7 @@
   <section v-if='controller' :id='$style.container'>
     <div v-if='!controller.found' :id='$style.loading'>
       <Loading :label='`Searching controller.. ${controller.found_try.value}/3`' />
-      <a v-if='failed' href='javascript:void(0)'>Retry now</a>
+      <a v-if='failed' href='javascript:void(0)' v-on:click='retry'>Retry now</a>
     </div>
     <div v-else v-for='(box, i) in controller.boxes'>
       <Box :i='i' :controller='controller' :box='box' :key='controller.broker_clientid.value + i' />
@@ -39,21 +39,26 @@ export default {
     }
   },
   components: { Box, Loading, },
+  methods: {
+    async retry() {
+      const controller = this.$store.getters['controllers/getSelected']
+      if (controller && controller.found == false) {
+        try {
+          this.$data.failed = false
+          await this.$store.dispatch('controllers/search_controller', {id: controller.broker_clientid.value})
+        } catch(e) {
+          this.$data.failed = true
+        }
+      }
+    },
+  },
   computed: {
     controller() {
       return this.$store.getters['controllers/getSelected']
     },
   },
   async mounted() {
-    const controller = this.$store.getters['controllers/getSelected']
-    if (controller && controller.found == false) {
-      try {
-        this.$data.failed = false
-        await this.$store.dispatch('controllers/search_controller', {id: controller.broker_clientid.value})
-      } catch(e) {
-        this.$data.failed = true
-      }
-    }
+    this.retry()
   },
   async fetch({ store }) {
     await store.dispatch('controllers/init')
