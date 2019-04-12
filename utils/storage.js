@@ -16,7 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import storage from 'electron-json-storage'
+const storage = require('electron-json-storage') // electron storage
+/*const storage = { // browser storage
+  get(key, fn) {
+    return new Promise((resolve, reject) => resolve(JSON.parse(window.localStorage.getItem(key))))
+  },
+  set(key, value, fn) {
+    JSON.stringify(key, JSON.stringify(value))
+    return new Promise((resolve, reject) => resolve())
+  }
+}*/
 
 /*storage.clear(function(error) {
   if (error) throw error

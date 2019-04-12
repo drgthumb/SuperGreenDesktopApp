@@ -19,7 +19,9 @@
 <template>
   <section v-if='controller' :id='$style.container'>
     <div v-if='!controller.found' :id='$style.loading'>
-      <Loading :label='`Searching controller.. ${controller.found_try}/3`' />
+      <div :id='$style.loading_relative'>
+        <Loading :label='`Searching controller.. ${controller.found_try}/3`' />
+      </div>
       <a v-if='failed' href='javascript:void(0)' v-on:click='retry'>Retry now</a>
     </div>
     <div v-else v-for='(box, i) in controller.boxes'>
@@ -58,6 +60,9 @@ export default {
     },
   },
   async mounted() {
+    this.$store.watch(state => state.controllers.selected, () => {
+      this.retry()
+    })
     this.retry()
   },
   async fetch({ store }) {
@@ -83,12 +88,22 @@ export default {
 
 
 #loading
+  position: absolute
+  width: 100%
+  height: 100%
+  top: 0
+  left: 0
   display: flex
   flex: 1
   flex-direction: column
   align-items: center
   justify-content: center
   position: relative
+  background-color: white
 
+#loading_relative
+  position: relative
+  height: 200pt
+  width: 400pt
 
 </style>
