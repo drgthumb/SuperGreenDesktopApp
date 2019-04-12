@@ -18,15 +18,17 @@
 
 <template>
   <section :id='$style.container'>
-    <h1 v-if='i == 0'>Bloom box<span :class='$style.grey'> - 34th day</span></h1>
-    <h1 v-else>Veg box {{ i }}<span :class='$style.grey'> - 34th day</span></h1>
     <div :id='$style.body'>
-      <div :class='$style.left_body'>
-        <BoxControl :i='i' :box='box' :controller='controller' />
-      </div>
-      <div :class='$style.right_body' :id='$style.monitoring'>
-        <BoxMonitoring :i='i' :box='box' :controller='controller' />
-        <BoxLiveview :i='i' :box='box' :controller='controller' />
+      <h1 v-if='i == 0'>Bloom box<span :class='$style.grey'> - 34th day</span></h1>
+      <h1 v-else>Veg box {{ i }}<span :class='$style.grey'> - 34th day</span></h1>
+      <div :id='$style.controls'>
+        <div :class='$style.left_body'>
+          <BoxControl :i='i' :box='box' :controller='controller' />
+        </div>
+        <div :class='$style.right_body' :id='$style.monitoring'>
+          <BoxMonitoring :i='i' :box='box' :controller='controller' />
+          <BoxLiveview :i='i' :box='box' :controller='controller' />
+        </div>
       </div>
     </div>
     <div v-if='!box.enabled.value' :id='$style.disabled_overlay'>
@@ -61,18 +63,20 @@ export default {
 
 #container
   position: relative
-  display: flex
-  padding: 10pt
   margin: 20pt
-  flex-direction: column
   background-color: white
   border-radius: 2pt
+
+#body
+  display: flex
+  padding: 10pt
+  flex-direction: column
 
 .grey
   font-size: 0.8em
   color: #B1B1B1
 
-#body
+#controls
   display: flex
 
 .left_body
@@ -87,6 +91,8 @@ export default {
   display: flex
   width: 100%
   height: 100%
+  top: 0
+  left: 0
   background-color: rgba(255, 255, 255, 0.8)
   z-index: 5
   align-items: center
