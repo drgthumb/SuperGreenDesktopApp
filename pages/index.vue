@@ -18,7 +18,11 @@
 
 <template>
   <section v-if='controller' :id='$style.container'>
-    <div v-for='(box, i) in controller.boxes'>
+    <div v-if='!controller.found' :id='$style.loading'>
+      <Loading :label='`Searching controller.. ${controller.found_try}/3`' />
+      <a v-if='failed' href='javascript:void(0)'>Retry now</a>
+    </div>
+    <div v-else v-for='(box, i) in controller.boxes'>
       <Box :i='i' :controller='controller' :box='box' :key='controller.broker_clientid.value + i' />
     </div>
   </section>
@@ -29,11 +33,27 @@ import Box from '../components/box'
 import Loading from '../components/loading'
 
 export default {
+  data() {
+    return {
+      failed: false,
+    }
+  },
   components: { Box, Loading, },
   computed: {
     controller() {
       return this.$store.getters['controllers/getSelected']
     },
+  },
+  async mounted() {
+    const controller = this.$store.getters['controllers/getSelected']
+    if (controller.found == false) {
+      try {
+        this.$data.failed = false
+        await this.$store.dispatch('controllers/search_controller', {id: controller.broker_clientid.value})
+      } catch(e) {
+        this.$data.failed = true
+      }
+    }
   },
   async fetch({ store }) {
     await store.dispatch('controllers/init')
@@ -47,6 +67,7 @@ export default {
 
 #container
   display: flex
+  position: relative
   flex: 1
   flex-direction: column
   background-color: #efefef
@@ -54,5 +75,15 @@ export default {
 
 #container > div
   max-width: 700pt
+
+
+#loading
+  display: flex
+  flex: 1
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  position: relative
+
 
 </style>

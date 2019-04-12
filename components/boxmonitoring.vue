@@ -35,7 +35,6 @@ export default {
   created() {
     const { i, controller } = this.$props,
       graph_id = `temphumi.${controller.broker_clientid.value}.${i}`
-    console.log(`http://metrics.supergreenlab.com?box=${i}&controller=${controller.broker_clientid.value}`)
     this.$store.dispatch('graphs/load_graph', {id: graph_id, url: `http://metrics.supergreenlab.com?box=${i}&controller=${controller.broker_clientid.value}`})
   },
   computed: {

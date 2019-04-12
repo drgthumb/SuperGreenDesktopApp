@@ -57,6 +57,7 @@ export default {
 #loadingpic
   width: 20pt
   height: 20pt
+  margin-bottom: 10pt
   background-image: url('~/assets/img/loading.svg')
   background-position: center
   background-size: contain

@@ -35,7 +35,6 @@ const storeState = (state) => {
 
 export const mutations = {
   init(state, { sources }) {
-    console.log('graphs init')
     state.sources = sources
   },
   add_source(state, { id, url }) {

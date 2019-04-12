@@ -19,8 +19,8 @@
 import storage from 'electron-json-storage'
 
 /*storage.clear(function(error) {
-  if (error) throw error;
-});*/
+  if (error) throw error
+})*/
 
 export default {
   async get(key, def) {
