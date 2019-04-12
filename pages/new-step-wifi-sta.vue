@@ -46,7 +46,11 @@ export default {
   layout: 'fullscreen',
   methods: {
     onNext(e) {
-      this.$store.commit('controllers/configure_search_ap_controller', {url: this.$data.url, is_sta: true})
+      let url = this.$data.url.toLowerCase()
+      if (url.indexOf('.local') == -1) {
+        url = `${url}.local`
+      }
+      this.$store.commit('controllers/configure_search_ap_controller', {url , is_sta: true})
     }
   }
 }

@@ -27,9 +27,9 @@ const storage = require('electron-json-storage') // electron storage
   }
 }*/
 
-/*storage.clear(function(error) {
+storage.clear(function(error) {
   if (error) throw error
-})*/
+})
 
 export default {
   async get(key, def) {

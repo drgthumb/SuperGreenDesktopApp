@@ -52,6 +52,9 @@ export default {
   },
   methods: {
     select(controller) {
+      this.$router.push('/setup-controller-wait-online')
+      this.$store.commit('controllers/set_selected', controller.broker_clientid.value)
+      return
       if (controller.state.value == 0) {
         this.$router.push('/setup-controller-preset')
       } else if (controller.wifi_status.value == 4) {

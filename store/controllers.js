@@ -287,6 +287,7 @@ export const actions = {
     }, 500)
   },
   async search_controller(context, { id }) {
+    context.commit('set_found_try', {id, n: 1})
     const controller = getById(context.state, id),
           url = controller.mdns_domain.value,
           { data: wifi_ip } = await controller_chain(id)(async () => axios.get(`http://${url}.local/s?k=WIFI_IP`, {timeout: 5000}), (e, n) => context.commit('set_found_try', {id, n}))

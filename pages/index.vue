@@ -43,12 +43,13 @@ export default {
   components: { Box, Loading, },
   methods: {
     async retry() {
+      this.$data.failed = false
       const controller = this.$store.getters['controllers/getSelected']
       if (controller && controller.found == false) {
         try {
-          this.$data.failed = false
           await this.$store.dispatch('controllers/search_controller', {id: controller.broker_clientid.value})
         } catch(e) {
+          console.log(e)
           this.$data.failed = true
         }
       }
@@ -59,7 +60,7 @@ export default {
       return this.$store.getters['controllers/getSelected']
     },
   },
-  async mounted() {
+  mounted() {
     this.$store.watch(state => state.controllers.selected, () => {
       this.retry()
     })

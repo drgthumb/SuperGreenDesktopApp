@@ -18,18 +18,19 @@
 
 <template>
   <section v-if='controller' :id='$style.container'>
-    <section :id='$style.top'>
+    <section v-if='!loading && !failed' :id='$style.top'>
       <CloseButton />
     </section>
-    <h1>New box detected.</h1>
-    <h3>Connect your computer back to the wifi network</h3>
-    <small>Check that the <div :id='$style.ssid'></div> is not back, it means wifi configuration failed. If it is back on, please connect to it, and <a href='javascript:void(0)' v-on:click='goBack'>go back to previous step</a></small>
-    <Loading v-if='loading' />
-    <a v-else href='javascript:void()' v-on:click='waitOnline'>Oups, did you try turning it off and back on again ? then click here to retry.</a>
+    <h1>Connect your computer back to the wifi network</h1>
+    <small>Check that the <div :id='$style.ssid'></div> is not back, if you can still connect to it, it means wifi configuration failed. If it is back on, please connect to it, and <a href='javascript:void(0)' v-on:click='goBack'>go back to previous step</a>. (macosx might still show it for some time, check that it fails to connect befor going back)</small>
     <section :id='$style.body'>
+      <Loading v-if='loading' :label='`Searching controller.. ${controller.found_try}/3`' />
+      <a v-else-if='!loading && failed' href='javascript:void()' v-on:click='waitOnline'>Oups, did you try turning it off and back on again ? then click here to retry.</a>
+      <h3 v-else>Now we're talking:)</h3>
+      <small>Click the Go! button on the bottom right</small>
     </section>
-    <section :id='$style.nav'>
-      <NextButton  :onClick='saveWifi' label='Connect wifi' />
+    <section v-if='!loading && !failed' :id='$style.nav'>
+      <NextButton label='Go !' to='/' />
     </section>
   </section>
 </template>
@@ -56,8 +57,9 @@ export default {
     async waitOnline() {
       this.$data.failed = false
       this.$data.loading = true
+      const controller = this.$store.getters['controllers/getSelected']
       try {
-        await this.$store.dispatch('controllers/set_controller_param', {id: controller.broker_clientid.value, key: 'wifi_ssid', value: this.$data.ssid}) 
+        await this.$store.dispatch('controllers/search_controller', {id: controller.broker_clientid.value})
       } catch(e) {
         console.log(e)
         this.$data.failed = true
@@ -68,6 +70,10 @@ export default {
       this.$router.back()
     },
   },
+  mounted() {
+    console.log('lol')
+    this.waitOnline()
+  }
 }
 </script>
 
@@ -75,7 +81,6 @@ export default {
 
 #container
   display: flex
-  position: relative
   align-items: center
   justify-content: center
   flex: 1
@@ -90,18 +95,22 @@ export default {
 
 #body
   display: flex
+  position: relative
   flex-direction: column
   flex: 1
   padding: 20pt
+  width: 100%
+  height: 200pt
   align-items: center
   justify-content: center
 
 #body > img
   margin: 10pt
 
-#body > small
+#container > small
+  text-align: center
   color: #e84a4a
-  padding: 5pt 0 20pt 0
+  padding: 10pt 50pt
 
 #body > input
   width: 100%
@@ -111,5 +120,14 @@ export default {
   display: flex
   justify-content: flex-end
   width: 100%
+
+#ssid
+  display: inline-block
+  height: 20pt
+  width: 30pt
+  background-image: url('~/assets/img/wifi-ssid.png')
+  background-repeat: no-repeat
+  background-size: contain
+  background-position: left
 
 </style>
