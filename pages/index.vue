@@ -19,7 +19,7 @@
 <template>
   <section v-if='controller' :id='$style.container'>
     <div v-if='!controller.found' :id='$style.loading'>
-      <Loading :label='`Searching controller.. ${controller.found_try}/3`' />
+      <Loading :label='`Searching controller.. ${controller.found_try.value}/3`' />
       <a v-if='failed' href='javascript:void(0)'>Retry now</a>
     </div>
     <div v-else v-for='(box, i) in controller.boxes'>
@@ -46,7 +46,7 @@ export default {
   },
   async mounted() {
     const controller = this.$store.getters['controllers/getSelected']
-    if (controller.found == false) {
+    if (controller && controller.found == false) {
       try {
         this.$data.failed = false
         await this.$store.dispatch('controllers/search_controller', {id: controller.broker_clientid.value})

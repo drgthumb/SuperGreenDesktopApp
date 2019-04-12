@@ -22,7 +22,9 @@ import storage from '../utils/storage'
 
 const controller_defaults = {
   discovery_url: '',
+  loaded: false,
   found: false,
+  found_try: 0,
   i2c: [],
   leds: [],
   boxes: [],
@@ -176,7 +178,7 @@ export const mutations = {
   },
   set_found_try(state, { id, n }) {
     let controller = getById(state, id)
-    controller.found_try = 
+    controller.found_try = n
     setById(state, id, controller)
   },
   loading_controller_param(state, { id, key }) {
@@ -260,6 +262,7 @@ export const actions = {
             { data: wifi_ip } = await discovery_chain(async () => axios.get(`http://${url}/s?k=WIFI_IP`, {timeout: 5000})),
             { data: mdns_domain } = await discovery_chain(async () => axios.get(`http://${url}/s?k=MDNS_DOMAIN`, {timeout: 5000}))
       controller = Object.assign({}, controller, {
+        loaded: true,
         broker_clientid: Object.assign({}, controller.broker_clientid, {
           value: broker_clientid, loaded: true
         }),
