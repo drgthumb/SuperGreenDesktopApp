@@ -13,4 +13,4 @@ dist
 # Mac OS
 .DS_Store
 
-*.swp
+*.sw*

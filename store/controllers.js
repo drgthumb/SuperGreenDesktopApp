@@ -54,8 +54,11 @@ const schedule_promise = (n, retries) => {
           resolve(await req_func())
           return
         } catch(e) {
-          console.log(e)
+          console.log('*******', e)
           error = e
+          if (e.status == 404) {
+            break
+          }
           ret_func && ret_func(e, i + 1)
         }
       }
@@ -63,7 +66,9 @@ const schedule_promise = (n, retries) => {
     })
     promises.push(p)
     if (promises.length >= n) {
-      loading_param_promise = Promise.all(promises)
+      loading_param_promise = Promise.all(promises).catch((e) => {
+        console.log('promise.all', e)
+      })
       promises = []
     }
 
@@ -290,7 +295,7 @@ export const actions = {
     context.commit('set_found_try', {id, n: 1})
     const controller = getById(context.state, id),
           url = controller.mdns_domain.value,
-          { data: wifi_ip } = await controller_chain(id)(async () => axios.get(`http://${url}.local/s?k=WIFI_IP`, {timeout: 5000}), (e, n) => context.commit('set_found_try', {id, n}))
+          { data: wifi_ip } = await controller_chain(id)(() => axios.get(`http://${url}.local/s?k=WIFI_IP`, {timeout: 5000}), (e, n) => context.commit('set_found_try', {id, n}))
     context.commit('loaded_controller_param', {id, key: 'wifi_ip', value: wifi_ip})
     context.commit('set_found', id)
   },

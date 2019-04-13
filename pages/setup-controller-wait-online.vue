@@ -22,14 +22,17 @@
       <CloseButton />
     </section>
     <h1>Connect your computer back to the wifi network</h1>
-    <small>Check that the <div :id='$style.ssid'></div> is not back, if you can still connect to it, it means wifi configuration failed. If it is back on, please connect to it, and <a href='javascript:void(0)' v-on:click='goBack'>go back to previous step</a>. (macosx might still show it for some time, check that it fails to connect befor going back)</small>
+    <small v-if='!(started && !loading && !failed)'>Check that the <div :id='$style.ssid'></div> is not back, if you can still connect to it, it means wifi configuration failed. If it is back on, please connect to it, and <a href='javascript:void(0)' v-on:click='goBack'>go back to previous step</a>. (macosx might still show it for some time, check that it fails to connect befor going back)</small>
     <section :id='$style.body'>
+      <a v-if='!started' href='javascript:void(0)' v-on:click='waitOnline'>I switched wifi, and the box stopped it's wifi. Search it !</a>
       <Loading v-if='loading' :label='`Searching controller.. ${controller.found_try}/3`' />
-      <a v-else-if='!loading && failed' href='javascript:void()' v-on:click='waitOnline'>Oups, did you try turning it off and back on again ? then click here to retry.</a>
-      <h3 v-else>Now we're talking:)</h3>
-      <small>Click the Go! button on the bottom right</small>
+      <a v-if='started && !loading && failed' href='javascript:void(0)' v-on:click='waitOnline'>Oups, did you try turning it off and back on again ? then click here to retry.</a>
+      <div v-if='started && !loading && !failed'>
+        <h3>Now we're talking:)</h3>
+        <small>Click the Go! button on the bottom right</small>
+      </div>
     </section>
-    <section v-if='!loading && !failed' :id='$style.nav'>
+    <section v-if='started && !loading && !failed' :id='$style.nav'>
       <NextButton label='Go !' to='/' />
     </section>
   </section>
@@ -43,8 +46,9 @@ import Loading from '../components/loading'
 export default {
   data() {
     return {
+      started: false,
       loading: false,
-      failed: true,
+      failed: false,
     }
   },
   components: { CloseButton, NextButton, Loading, },
@@ -55,6 +59,7 @@ export default {
   },
   methods: {
     async waitOnline() {
+      this.$data.started = true
       this.$data.failed = false
       this.$data.loading = true
       const controller = this.$store.getters['controllers/getSelected']
@@ -69,10 +74,6 @@ export default {
     goBack() {
       this.$router.back()
     },
-  },
-  mounted() {
-    console.log('lol')
-    this.waitOnline()
   }
 }
 </script>
