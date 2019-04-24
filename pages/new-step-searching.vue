@@ -23,7 +23,7 @@
     </section>
     <section :id='$style.body'>
       <img src="~/assets/img/loading.png">
-      <h3>Pease wait...</h3>
+      <h3>Please wait - Finding your controller...</h3>
       <small>Probing {{ retries }} / 5</small>
     </section>
   </section>
